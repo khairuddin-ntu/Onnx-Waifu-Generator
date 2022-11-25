@@ -55,6 +55,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onDestroy() {
+        onnxGenerator.close()
+        super.onDestroy()
+    }
+
     private suspend fun generateShape() = withContext(Dispatchers.Unconfined) {
         onnxGenerator.generateImage(0, floatArrayOf(0f, 0f), 0f)
     }

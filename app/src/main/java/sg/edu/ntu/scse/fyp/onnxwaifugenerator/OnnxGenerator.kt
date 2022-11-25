@@ -86,6 +86,14 @@ class OnnxGenerator(res: Resources) {
     }
 
     /**
+     * Closes sessions so that they are cleared from memory
+     */
+    fun close() {
+        mappingSession.close()
+        synthesisSession.close()
+    }
+
+    /**
      * Reads model file from raw folder
      *
      * @param res Resources object from Android UI

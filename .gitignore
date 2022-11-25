@@ -1,5 +1,6 @@
 # Extensions
 *.iml
+*.onnx
 *.properties
 */build
 

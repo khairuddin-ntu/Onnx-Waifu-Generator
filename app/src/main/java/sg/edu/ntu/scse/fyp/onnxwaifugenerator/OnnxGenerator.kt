@@ -52,6 +52,8 @@ class OnnxGenerator(res: Resources) {
      * @return Output from mapping & synthesis models as byte array
      */
     fun generateImage(seed: Int, psi: FloatArray, noise: Float): ByteArray {
+        Log.d(TAG, "++generateImage++")
+        val startTime = System.currentTimeMillis()
         val ran = Random(seed)
 
         // Run mapping
@@ -79,6 +81,7 @@ class OnnxGenerator(res: Resources) {
 
         val synthesisOutput = synthesisSession.run(synthesisInputs).get(0) as OnnxTensor
         Log.d(TAG, "generateImage: Synthesis output info = ${synthesisOutput.info}")
+        Log.d(TAG, "--generateImage--   Time taken to run = ${System.currentTimeMillis() - startTime}ms")
         return synthesisOutput.byteBuffer.array()
     }
 

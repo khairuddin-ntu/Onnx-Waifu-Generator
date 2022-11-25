@@ -1,0 +1,13 @@
+# Extensions
+*.iml
+*.properties
+*/build
+
+# Folders
+/.gradle
+/.idea
+/build
+/gradle
+
+# Exceptions
+!/.gradle/wrapper/gradle-wrapper.properties

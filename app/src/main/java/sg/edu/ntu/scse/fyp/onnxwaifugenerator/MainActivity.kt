@@ -64,7 +64,8 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "generateShape: Converting model output to Bitmap")
         val imgWidth = shape[3].toInt()
         val imgHeight = shape[2].toInt()
-        val bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.RGBA_F16)
+
+        val bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.ARGB_8888)
         bitmap.copyPixelsFromBuffer(modelOutput)
 
         val fileName = "model-output-${System.currentTimeMillis()}.png"

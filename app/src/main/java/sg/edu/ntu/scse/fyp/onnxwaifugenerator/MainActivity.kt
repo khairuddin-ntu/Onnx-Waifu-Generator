@@ -1,23 +1,20 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
+import android.graphics.Bitmap
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.ui.theme.OnnxWaifuGeneratorTheme
+import java.io.File
 
 private const val TAG = "MainActivity"
 
@@ -61,6 +58,21 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun generateShape() = withContext(Dispatchers.Unconfined) {
-        onnxGenerator.generateImage(0, floatArrayOf(0f, 0f), 0f)
+        val (modelOutput, shape) = onnxGenerator.generateImage(0, floatArrayOf(0f, 0f), 0f)
+
+        Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
+        Log.d(TAG, "generateShape: Converting model output to Bitmap")
+        val imgWidth = shape[3].toInt()
+        val imgHeight = shape[2].toInt()
+        val bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.RGBA_F16)
+        bitmap.copyPixelsFromBuffer(modelOutput)
+
+        val fileName = "model-output-${System.currentTimeMillis()}.png"
+        val file = File(applicationContext.filesDir, fileName)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
+        Log.d(
+            TAG,
+            "generateShape: Bitmap stored in ${applicationContext.filesDir.absolutePath}/$fileName"
+        )
     }
 }

@@ -32,8 +32,8 @@ fun AppUi() {
     val (isGenerating, setIsGenerating) = remember { mutableStateOf(false) }
     val (seed, setSeed) = remember { mutableStateOf(0) }
     val (isRandomSeed, setRandomSeed) = remember { mutableStateOf(false) }
-    val (trunc1, setTrunc1) = remember { mutableStateOf(0f) }
-    val (trunc2, setTrunc2) = remember { mutableStateOf(0f) }
+    val (trunc1, setTrunc1) = remember { mutableStateOf(1f) }
+    val (trunc2, setTrunc2) = remember { mutableStateOf(1f) }
 
     val (image, setImage) = remember { mutableStateOf<Bitmap?>(null) }
 

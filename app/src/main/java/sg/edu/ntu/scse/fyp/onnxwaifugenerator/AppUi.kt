@@ -59,7 +59,14 @@ fun AppUi() {
 
     val generateShape: () -> Unit = {
         setIsGenerating(true)
-        val finalSeed = if (isRandomSeed) Random.nextInt(0, Int.MAX_VALUE) else seed
+
+        val finalSeed: Int
+        if (isRandomSeed) {
+            finalSeed = Random.nextInt(0, Int.MAX_VALUE)
+            setSeed(finalSeed)
+        } else {
+            finalSeed = seed
+        }
 
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {

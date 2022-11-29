@@ -5,10 +5,7 @@ import android.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +30,7 @@ fun AppUi() {
 
     val (isGenerating, setIsGenerating) = remember { mutableStateOf(false) }
     val (seed, setSeed) = remember { mutableStateOf(0) }
+    val (isRandomSeed, setRandomSeed) = remember { mutableStateOf(false) }
     val (trunc1, setTrunc1) = remember { mutableStateOf(0f) }
     val (trunc2, setTrunc2) = remember { mutableStateOf(0f) }
 
@@ -110,6 +108,16 @@ fun AppUi() {
             onValueChange = { setSeed(it.toInt()) },
             enabled = !isGenerating
         )
+        Row(
+            modifier = Modifier.align(Alignment.End),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = isRandomSeed,
+                onCheckedChange = setRandomSeed
+            )
+            Text("Random")
+        }
         Row {
             Text("Truncation 1")
             Spacer(Modifier.weight(1f))

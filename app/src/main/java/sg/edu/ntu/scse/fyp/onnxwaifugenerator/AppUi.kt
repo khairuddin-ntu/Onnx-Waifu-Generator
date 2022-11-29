@@ -4,10 +4,9 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,6 +29,9 @@ fun AppUi() {
 
     val scope = rememberCoroutineScope()
     val (onnxGenerator, _) = remember { mutableStateOf(OnnxGenerator(resources)) }
+
+    val (trunc1, setTrunc1) = remember { mutableStateOf(0f) }
+
     val (image, setImage) = remember { mutableStateOf<Bitmap?>(null) }
 
     // Converts model output to Bitmap
@@ -88,6 +90,16 @@ fun AppUi() {
             .fillMaxSize()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
+        Row {
+            Text("Truncation 1")
+            Spacer(Modifier.weight(1f))
+            Text(trunc1.toString())
+        }
+        Slider(
+            value = trunc1,
+            valueRange = 0f..2.0f,
+            onValueChange = setTrunc1
+        )
         Button(onClick = generateShape) {
             Text(text = "Generate")
         }

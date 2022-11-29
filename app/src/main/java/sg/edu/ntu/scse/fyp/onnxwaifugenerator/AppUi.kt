@@ -58,7 +58,9 @@ fun AppUi() {
     val generateShape: () -> Unit = {
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {
-            val (modelOutput, shape) = onnxGenerator.generateImage(0, floatArrayOf(0f, 0f), 0f)
+            val (modelOutput, shape) = onnxGenerator.generateImage(
+                0, floatArrayOf(trunc1, trunc2), 0f
+            )
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
             val imgWidth = shape[3].toInt()

@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 private const val TAG = "AppUi"
 
@@ -58,11 +59,12 @@ fun AppUi() {
 
     val generateShape: () -> Unit = {
         setIsGenerating(true)
+        val finalSeed = if (isRandomSeed) Random.nextInt(0, Int.MAX_VALUE) else seed
 
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {
             val (modelOutput, shape) = onnxGenerator.generateImage(
-                seed, floatArrayOf(trunc1, trunc2), 0f
+                finalSeed, floatArrayOf(trunc1, trunc2), 0f
             )
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
@@ -70,8 +72,8 @@ fun AppUi() {
             val imgHeight = shape[2].toInt()
 
             val bitmap = modelToBitmap(modelOutput, imgWidth, imgHeight)
-            setIsGenerating(false)
             setImage(bitmap)
+            setIsGenerating(false)
 
             // Save to file in app storage
 //        val fileName = "model-output-${System.currentTimeMillis()}.png"
@@ -114,7 +116,8 @@ fun AppUi() {
         ) {
             Checkbox(
                 checked = isRandomSeed,
-                onCheckedChange = setRandomSeed
+                onCheckedChange = setRandomSeed,
+                enabled = !isGenerating
             )
             Text("Random")
         }

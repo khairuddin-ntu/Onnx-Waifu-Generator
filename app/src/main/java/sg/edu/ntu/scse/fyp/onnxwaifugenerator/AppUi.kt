@@ -4,11 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 private const val TAG = "AppUi"
 
@@ -30,6 +28,13 @@ fun AppUi() {
 
     val scope = rememberCoroutineScope()
     val (onnxGenerator, _) = remember { mutableStateOf(OnnxGenerator(resources)) }
+
+    val (isGenerating, setIsGenerating) = remember { mutableStateOf(false) }
+    val (seed, setSeed) = remember { mutableStateOf(0) }
+    val (isRandomSeed, setRandomSeed) = remember { mutableStateOf(false) }
+    val (trunc1, setTrunc1) = remember { mutableStateOf(1f) }
+    val (trunc2, setTrunc2) = remember { mutableStateOf(1f) }
+
     val (image, setImage) = remember { mutableStateOf<Bitmap?>(null) }
 
     // Converts model output to Bitmap
@@ -53,9 +58,21 @@ fun AppUi() {
     }
 
     val generateShape: () -> Unit = {
+        setIsGenerating(true)
+
+        val finalSeed: Int
+        if (isRandomSeed) {
+            finalSeed = Random.nextInt(0, Int.MAX_VALUE)
+            setSeed(finalSeed)
+        } else {
+            finalSeed = seed
+        }
+
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {
-            val (modelOutput, shape) = onnxGenerator.generateImage(0, floatArrayOf(0f, 0f), 0f)
+            val (modelOutput, shape) = onnxGenerator.generateImage(
+                finalSeed, floatArrayOf(trunc1, trunc2), 0f
+            )
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
             val imgWidth = shape[3].toInt()
@@ -63,6 +80,7 @@ fun AppUi() {
 
             val bitmap = modelToBitmap(modelOutput, imgWidth, imgHeight)
             setImage(bitmap)
+            setIsGenerating(false)
 
             // Save to file in app storage
 //        val fileName = "model-output-${System.currentTimeMillis()}.png"
@@ -88,10 +106,60 @@ fun AppUi() {
             .fillMaxSize()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
-        Button(onClick = generateShape) {
+        Row {
+            Text("Seed")
+            Spacer(Modifier.weight(1f))
+            Text(seed.toString())
+        }
+        Slider(
+            value = seed.toFloat(),
+            valueRange = 0f..Int.MAX_VALUE.toFloat(),
+            onValueChange = { setSeed(it.toInt()) },
+            enabled = !isGenerating && !isRandomSeed
+        )
+        Row(
+            modifier = Modifier.align(Alignment.End),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = isRandomSeed,
+                onCheckedChange = setRandomSeed,
+                enabled = !isGenerating
+            )
+            Text("Random")
+        }
+        Row {
+            Text("Truncation 1")
+            Spacer(Modifier.weight(1f))
+            Text(trunc1.toString())
+        }
+        Slider(
+            value = trunc1,
+            valueRange = 0f..2.0f,
+            onValueChange = setTrunc1,
+            enabled = !isGenerating
+        )
+        Row {
+            Text("Truncation 2")
+            Spacer(Modifier.weight(1f))
+            Text(trunc2.toString())
+        }
+        Slider(
+            value = trunc2,
+            valueRange = 0f..2.0f,
+            onValueChange = setTrunc2,
+            enabled = !isGenerating
+        )
+        Button(
+            onClick = generateShape,
+            enabled = !isGenerating
+        ) {
             Text(text = "Generate")
         }
-        if (image != null) {
+        if (isGenerating) {
+            CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
+        }
+        if (image != null && !isGenerating) {
             Image(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 bitmap = image.asImageBitmap(),

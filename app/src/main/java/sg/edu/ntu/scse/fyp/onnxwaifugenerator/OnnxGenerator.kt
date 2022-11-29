@@ -49,7 +49,7 @@ class OnnxGenerator(res: Resources) {
      * @param psi Array of slider values
      * @param noise Noise value for synthesis
      *
-     * @return Output from mapping & synthesis models as byte buffer and shape of output Tensor as
+     * @return Output from mapping & synthesis models as float array and shape of output Tensor as
      * a long array
      */
     fun generateImage(seed: Int, psi: FloatArray, noise: Float): Pair<FloatArray, LongArray> {

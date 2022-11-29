@@ -32,31 +32,36 @@ fun AppUi() {
     val (onnxGenerator, _) = remember { mutableStateOf(OnnxGenerator(resources)) }
     val (image, setImage) = remember { mutableStateOf<Bitmap?>(null) }
 
+    // Converts model output to Bitmap
+    val modelToBitmap = { modelOutput: FloatArray, imgWidth: Int, imgHeight: Int ->
+        val minVal = modelOutput.minOrNull() ?: -1.0f
+        val maxVal = modelOutput.maxOrNull() ?: 1.0f
+        val delta = maxVal - minVal
+
+        val pixels = IntArray(imgWidth * imgHeight * 4)
+        for (i in 0 until imgWidth * imgHeight) {
+            pixels[i] = Color.rgb(
+                ((modelOutput[i] - minVal) / delta * 255.0f).roundToInt(),
+                ((modelOutput[i + imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt(),
+                ((modelOutput[i + 2 * imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt()
+            )
+        }
+
+        val bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.ARGB_8888)
+        bitmap.setPixels(pixels, 0, imgWidth, 0, 0, imgWidth, imgHeight)
+        bitmap
+    }
+
     val generateShape: () -> Unit = {
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {
             val (modelOutput, shape) = onnxGenerator.generateImage(0, floatArrayOf(0f, 0f), 0f)
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
-            Log.d(TAG, "generateShape: Converting model output to Bitmap")
             val imgWidth = shape[3].toInt()
             val imgHeight = shape[2].toInt()
 
-            val minVal = modelOutput.minOrNull() ?: -1.0f
-            val maxVal = modelOutput.maxOrNull() ?: 1.0f
-            val delta = maxVal - minVal
-
-            val pixels = IntArray(imgWidth * imgHeight * 4)
-            for (i in 0 until imgWidth * imgHeight) {
-                pixels[i] = Color.rgb(
-                    ((modelOutput[i] - minVal) / delta * 255.0f).roundToInt(),
-                    ((modelOutput[i + imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt(),
-                    ((modelOutput[i + 2 * imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt()
-                )
-            }
-
-            val bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.ARGB_8888)
-            bitmap.setPixels(pixels, 0, imgWidth, 0, 0, imgWidth, imgHeight)
+            val bitmap = modelToBitmap(modelOutput, imgWidth, imgHeight)
             setImage(bitmap)
 
             // Save to file in app storage

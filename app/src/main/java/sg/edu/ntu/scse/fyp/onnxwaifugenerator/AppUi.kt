@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -30,6 +31,7 @@ fun AppUi() {
     val scope = rememberCoroutineScope()
     val (onnxGenerator, _) = remember { mutableStateOf(OnnxGenerator(resources)) }
 
+    val (isGenerating, setIsGenerating) = remember { mutableStateOf(false) }
     val (seed, setSeed) = remember { mutableStateOf(0) }
     val (trunc1, setTrunc1) = remember { mutableStateOf(0f) }
     val (trunc2, setTrunc2) = remember { mutableStateOf(0f) }
@@ -57,6 +59,8 @@ fun AppUi() {
     }
 
     val generateShape: () -> Unit = {
+        setIsGenerating(true)
+
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {
             val (modelOutput, shape) = onnxGenerator.generateImage(
@@ -68,6 +72,7 @@ fun AppUi() {
             val imgHeight = shape[2].toInt()
 
             val bitmap = modelToBitmap(modelOutput, imgWidth, imgHeight)
+            setIsGenerating(false)
             setImage(bitmap)
 
             // Save to file in app storage
@@ -102,7 +107,8 @@ fun AppUi() {
         Slider(
             value = seed.toFloat(),
             valueRange = 0f..Int.MAX_VALUE.toFloat(),
-            onValueChange = { setSeed(it.toInt()) }
+            onValueChange = { setSeed(it.toInt()) },
+            enabled = !isGenerating
         )
         Row {
             Text("Truncation 1")
@@ -112,7 +118,8 @@ fun AppUi() {
         Slider(
             value = trunc1,
             valueRange = 0f..2.0f,
-            onValueChange = setTrunc1
+            onValueChange = setTrunc1,
+            enabled = !isGenerating
         )
         Row {
             Text("Truncation 2")
@@ -122,12 +129,19 @@ fun AppUi() {
         Slider(
             value = trunc2,
             valueRange = 0f..2.0f,
-            onValueChange = setTrunc2
+            onValueChange = setTrunc2,
+            enabled = !isGenerating
         )
-        Button(onClick = generateShape) {
+        Button(
+            onClick = generateShape,
+            enabled = !isGenerating
+        ) {
             Text(text = "Generate")
         }
-        if (image != null) {
+        if (isGenerating) {
+            CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
+        }
+        if (image != null && !isGenerating) {
             Image(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 bitmap = image.asImageBitmap(),

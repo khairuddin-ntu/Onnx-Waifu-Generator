@@ -31,6 +31,7 @@ fun AppUi() {
     val (onnxGenerator, _) = remember { mutableStateOf(OnnxGenerator(resources)) }
 
     val (trunc1, setTrunc1) = remember { mutableStateOf(0f) }
+    val (trunc2, setTrunc2) = remember { mutableStateOf(0f) }
 
     val (image, setImage) = remember { mutableStateOf<Bitmap?>(null) }
 
@@ -99,6 +100,16 @@ fun AppUi() {
             value = trunc1,
             valueRange = 0f..2.0f,
             onValueChange = setTrunc1
+        )
+        Row {
+            Text("Truncation 2")
+            Spacer(Modifier.weight(1f))
+            Text(trunc2.toString())
+        }
+        Slider(
+            value = trunc2,
+            valueRange = 0f..2.0f,
+            onValueChange = setTrunc2
         )
         Button(onClick = generateShape) {
             Text(text = "Generate")

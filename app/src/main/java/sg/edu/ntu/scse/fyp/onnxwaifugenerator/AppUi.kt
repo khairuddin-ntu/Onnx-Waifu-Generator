@@ -30,6 +30,7 @@ fun AppUi() {
     val scope = rememberCoroutineScope()
     val (onnxGenerator, _) = remember { mutableStateOf(OnnxGenerator(resources)) }
 
+    val (seed, setSeed) = remember { mutableStateOf(0) }
     val (trunc1, setTrunc1) = remember { mutableStateOf(0f) }
     val (trunc2, setTrunc2) = remember { mutableStateOf(0f) }
 
@@ -59,7 +60,7 @@ fun AppUi() {
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {
             val (modelOutput, shape) = onnxGenerator.generateImage(
-                0, floatArrayOf(trunc1, trunc2), 0f
+                seed, floatArrayOf(trunc1, trunc2), 0f
             )
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
@@ -93,6 +94,16 @@ fun AppUi() {
             .fillMaxSize()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
+        Row {
+            Text("Seed")
+            Spacer(Modifier.weight(1f))
+            Text(seed.toString())
+        }
+        Slider(
+            value = seed.toFloat(),
+            valueRange = 0f..Int.MAX_VALUE.toFloat(),
+            onValueChange = { setSeed(it.toInt()) }
+        )
         Row {
             Text("Truncation 1")
             Spacer(Modifier.weight(1f))

@@ -108,7 +108,7 @@ fun AppUi() {
             value = seed.toFloat(),
             valueRange = 0f..Int.MAX_VALUE.toFloat(),
             onValueChange = { setSeed(it.toInt()) },
-            enabled = !isGenerating
+            enabled = !isGenerating && !isRandomSeed
         )
         Row(
             modifier = Modifier.align(Alignment.End),

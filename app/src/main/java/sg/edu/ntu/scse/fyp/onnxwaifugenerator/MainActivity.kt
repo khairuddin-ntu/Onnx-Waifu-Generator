@@ -1,6 +1,7 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.ui.theme.OnnxWaifuGeneratorTheme
 import java.io.File
+import kotlin.math.roundToInt
 
 private const val TAG = "MainActivity"
 
@@ -65,8 +67,20 @@ class MainActivity : ComponentActivity() {
         val imgWidth = shape[3].toInt()
         val imgHeight = shape[2].toInt()
 
+        val minVal = modelOutput.minOrNull() ?: -1.0f
+        val maxVal = modelOutput.maxOrNull() ?: 1.0f
+        val delta = maxVal - minVal
+
+        val pixels = IntArray(imgWidth * imgHeight * 4)
+        for (i in 0 until imgWidth * imgHeight) {
+            val r = ((modelOutput[i] - minVal) / delta * 255.0f).roundToInt();
+            val g = ((modelOutput[i + imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt()
+            val b = ((modelOutput[i + 2 * imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt()
+            pixels[i] = Color.rgb(r, g, b)
+        }
+
         val bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.ARGB_8888)
-        bitmap.copyPixelsFromBuffer(modelOutput)
+        bitmap.setPixels(pixels, 0, imgWidth, 0, 0, imgWidth, imgHeight)
 
         val fileName = "model-output-${System.currentTimeMillis()}.png"
         val file = File(applicationContext.filesDir, fileName)

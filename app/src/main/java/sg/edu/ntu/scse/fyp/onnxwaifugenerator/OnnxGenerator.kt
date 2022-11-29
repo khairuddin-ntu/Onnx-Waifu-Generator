@@ -6,7 +6,6 @@ import ai.onnxruntime.OrtSession
 import android.content.res.Resources
 import android.util.Log
 import androidx.annotation.RawRes
-import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import kotlin.random.Random
 
@@ -53,7 +52,7 @@ class OnnxGenerator(res: Resources) {
      * @return Output from mapping & synthesis models as byte buffer and shape of output Tensor as
      * a long array
      */
-    fun generateImage(seed: Int, psi: FloatArray, noise: Float): Pair<ByteBuffer, LongArray> {
+    fun generateImage(seed: Int, psi: FloatArray, noise: Float): Pair<FloatArray, LongArray> {
         Log.d(TAG, "++generateImage++")
         val startTime = System.currentTimeMillis()
         val ran = Random(seed)
@@ -85,7 +84,7 @@ class OnnxGenerator(res: Resources) {
         val outputInfo = synthesisOutput.info
         Log.d(TAG, "generateImage: Synthesis output info = $outputInfo")
         Log.d(TAG, "--generateImage--   Time taken to run = ${System.currentTimeMillis() - startTime}ms")
-        return synthesisOutput.byteBuffer to outputInfo.shape
+        return synthesisOutput.floatBuffer.array() to outputInfo.shape
     }
 
     /**

@@ -21,9 +21,15 @@ class OnnxController {
             OnnxModel.SKYTNT -> OnnxGenerator(
                 env,
                 env.createSession(loadModel(res, R.raw.g_mapping)),
-                env.createSession(loadModel(res, R.raw.g_synthesis))
+                env.createSession(loadModel(res, R.raw.g_synthesis)),
+                1024
             )
-            OnnxModel.CUSTOM -> TODO()
+            OnnxModel.CUSTOM -> OnnxGenerator(
+                env,
+                env.createSession(loadModel(res, R.raw.g_mapping_aravind)),
+                env.createSession(loadModel(res, R.raw.g_synthesis_aravind)),
+                512
+            )
         }
         val output = generator.generateImage(seed, psi, noise)
         onnxGenerator = generator

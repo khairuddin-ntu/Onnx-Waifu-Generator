@@ -7,8 +7,6 @@ import android.util.Log
 import java.nio.FloatBuffer
 import kotlin.random.Random
 
-const val RANDOM_INPUT_SIZE = 1024
-
 private const val TAG = "OnnxGenerator"
 
 /**
@@ -21,7 +19,8 @@ private const val TAG = "OnnxGenerator"
 class OnnxGenerator(
     private val env: OrtEnvironment,
     private val mappingSession: OrtSession,
-    private val synthesisSession: OrtSession
+    private val synthesisSession: OrtSession,
+    private val zSize: Int
 ) {
     /**
      * Generates an image using models
@@ -39,8 +38,8 @@ class OnnxGenerator(
         val ran = Random(seed)
 
         // Run mapping
-        val zBuffer = FloatBuffer.wrap(FloatArray(RANDOM_INPUT_SIZE) { ran.nextFloat() })
-        val zTensor = OnnxTensor.createTensor(env, zBuffer, longArrayOf(1, RANDOM_INPUT_SIZE.toLong()))
+        val zBuffer = FloatBuffer.wrap(FloatArray(zSize) { ran.nextFloat() })
+        val zTensor = OnnxTensor.createTensor(env, zBuffer, longArrayOf(1, zSize.toLong()))
 
         val psiBuffer = FloatBuffer.wrap(psi)
         val psiTensor = OnnxTensor.createTensor(env, psiBuffer, longArrayOf(psi.size.toLong()))

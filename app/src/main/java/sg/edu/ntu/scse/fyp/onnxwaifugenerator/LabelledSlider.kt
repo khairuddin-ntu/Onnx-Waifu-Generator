@@ -43,7 +43,7 @@ fun ModelParamSlider(
         value = value,
         valueRange = 0f..maxValue,
         onValueChange = onValueChange,
-        steps = (2f/ 0.1f).toInt() - 1,
+        steps = (maxValue / 0.1f).toInt() - 1,
         isEnabled = isEnabled
     )
 }

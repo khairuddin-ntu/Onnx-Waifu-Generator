@@ -122,11 +122,16 @@ fun AppUi() {
                     Modifier.selectable(
                         selected = model == onnxModel,
                         onClick = { setModel(onnxModel) },
-                        role = Role.RadioButton
+                        role = Role.RadioButton,
+                        enabled = !isGenerating
                     )
                 ) {
 
-                    RadioButton(selected = model == onnxModel, onClick = null)
+                    RadioButton(
+                        selected = model == onnxModel,
+                        onClick = null,
+                        enabled = !isGenerating
+                    )
                     Text(onnxModel.label)
                 }
             }

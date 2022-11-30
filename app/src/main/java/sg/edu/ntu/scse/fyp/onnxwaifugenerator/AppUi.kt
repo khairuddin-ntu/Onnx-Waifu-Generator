@@ -4,8 +4,14 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -106,16 +112,12 @@ fun AppUi() {
             .fillMaxSize()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
-        Row {
-            Text("Seed")
-            Spacer(Modifier.weight(1f))
-            Text(seed.toString())
-        }
-        Slider(
+        LabelledSlider(
+            label = "Seed",
             value = seed.toFloat(),
             valueRange = 0f..Int.MAX_VALUE.toFloat(),
             onValueChange = { setSeed(it.toInt()) },
-            enabled = !isGenerating && !isRandomSeed
+            isEnabled = !isGenerating && !isRandomSeed
         )
         Row(
             modifier = Modifier.align(Alignment.End),
@@ -128,27 +130,19 @@ fun AppUi() {
             )
             Text("Random")
         }
-        Row {
-            Text("Truncation 1")
-            Spacer(Modifier.weight(1f))
-            Text(trunc1.toString())
-        }
-        Slider(
+        LabelledSlider(
+            label = "Truncation 1",
             value = trunc1,
             valueRange = 0f..2.0f,
             onValueChange = setTrunc1,
-            enabled = !isGenerating
+            isEnabled = !isGenerating
         )
-        Row {
-            Text("Truncation 2")
-            Spacer(Modifier.weight(1f))
-            Text(trunc2.toString())
-        }
-        Slider(
+        LabelledSlider(
+            label = "Truncation 2",
             value = trunc2,
             valueRange = 0f..2.0f,
             onValueChange = setTrunc2,
-            enabled = !isGenerating
+            isEnabled = !isGenerating
         )
         Button(
             onClick = generateShape,

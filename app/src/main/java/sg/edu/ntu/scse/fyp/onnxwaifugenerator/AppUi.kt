@@ -17,6 +17,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -83,8 +84,11 @@ fun AppUi() {
             val imgHeight = shape[2].toInt()
 
             val bitmap = modelToBitmap(modelOutput, imgWidth, imgHeight)
-            setImage(bitmap)
-            setIsGenerating(false)
+
+            withContext(Dispatchers.Main) {
+                setImage(bitmap)
+                setIsGenerating(false)
+            }
 
             // Save to file in app storage
 //        val fileName = "model-output-${System.currentTimeMillis()}.png"

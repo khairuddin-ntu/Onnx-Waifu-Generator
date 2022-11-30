@@ -29,3 +29,21 @@ fun LabelledSlider(
         enabled = isEnabled
     )
 }
+
+@Composable
+fun ModelParamSlider(
+    label: String,
+    value: Float,
+    maxValue: Float,
+    onValueChange: (Float) -> Unit,
+    isEnabled: Boolean
+) {
+    LabelledSlider(
+        label = label,
+        value = value,
+        valueRange = 0f..maxValue,
+        onValueChange = onValueChange,
+        steps = (2f/ 0.1f).toInt() - 1,
+        isEnabled = isEnabled
+    )
+}

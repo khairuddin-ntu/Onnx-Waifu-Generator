@@ -145,20 +145,18 @@ fun AppUi() {
             )
             Text("Random")
         }
-        LabelledSlider(
+        ModelParamSlider(
             label = "Truncation 1",
             value = trunc1,
-            valueRange = 0f..2.0f,
+            maxValue = 2f,
             onValueChange = setTrunc1,
-            steps = (2f/ 0.1f).toInt() - 1,
             isEnabled = !isGenerating
         )
-        LabelledSlider(
+        ModelParamSlider(
             label = "Truncation 2",
             value = trunc2,
-            valueRange = 0f..2.0f,
+            maxValue = 2f,
             onValueChange = setTrunc2,
-            steps = (2f/ 0.1f).toInt() - 1,
             isEnabled = !isGenerating
         )
         Button(

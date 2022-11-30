@@ -13,6 +13,7 @@ fun LabelledSlider(
     value: Float,
     valueRange: ClosedFloatingPointRange<Float>,
     onValueChange: (Float) -> Unit,
+    steps: Int = 0,
     isEnabled: Boolean
 ) {
     Row {
@@ -24,6 +25,7 @@ fun LabelledSlider(
         value = value,
         valueRange = valueRange,
         onValueChange = onValueChange,
+        steps = steps,
         enabled = isEnabled
     )
 }

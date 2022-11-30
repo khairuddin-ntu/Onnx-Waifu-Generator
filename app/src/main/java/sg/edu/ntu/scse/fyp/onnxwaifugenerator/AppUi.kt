@@ -150,6 +150,7 @@ fun AppUi() {
             value = trunc1,
             valueRange = 0f..2.0f,
             onValueChange = setTrunc1,
+            steps = (2f/ 0.1f).toInt() - 1,
             isEnabled = !isGenerating
         )
         LabelledSlider(
@@ -157,6 +158,7 @@ fun AppUi() {
             value = trunc2,
             valueRange = 0f..2.0f,
             onValueChange = setTrunc2,
+            steps = (2f/ 0.1f).toInt() - 1,
             isEnabled = !isGenerating
         )
         Button(

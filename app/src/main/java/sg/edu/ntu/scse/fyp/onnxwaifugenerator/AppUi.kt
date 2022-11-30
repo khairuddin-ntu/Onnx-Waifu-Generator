@@ -29,7 +29,7 @@ private const val TAG = "AppUi"
 fun AppUi() {
     val resources = LocalContext.current.resources
     val scope = rememberCoroutineScope()
-    val (onnxController, _) = remember { mutableStateOf(OnnxController()) }
+    val (onnxController, _) = remember { mutableStateOf(OnnxController(resources)) }
 
     val (isGenerating, setIsGenerating) = remember { mutableStateOf(false) }
     val (model, setModel) = remember { mutableStateOf(OnnxModel.SKYTNT) }
@@ -75,7 +75,7 @@ fun AppUi() {
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {
             val (modelOutput, shape) = onnxController.generateImage(
-                resources, model, finalSeed, floatArrayOf(trunc1, trunc2), noise
+                model, finalSeed, floatArrayOf(trunc1, trunc2), noise
             )
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")

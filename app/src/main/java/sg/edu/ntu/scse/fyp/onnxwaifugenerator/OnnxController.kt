@@ -4,40 +4,44 @@ import ai.onnxruntime.OrtEnvironment
 import android.content.res.Resources
 import androidx.annotation.RawRes
 
-class OnnxController {
-    private var onnxGenerator: OnnxGenerator? = null
+class OnnxController(res: Resources) {
+    private val skytntGenerator by lazy {
+        val env = OrtEnvironment.getEnvironment()
+        OnnxGenerator(
+            env,
+            env.createSession(loadModel(res, R.raw.g_mapping)),
+            env.createSession(loadModel(res, R.raw.g_synthesis)),
+            1024
+        )
+    }
+
+    private val customGenerator by lazy {
+        val env = OrtEnvironment.getEnvironment()
+        OnnxGenerator(
+            env,
+            env.createSession(loadModel(res, R.raw.g_mapping_aravind)),
+            env.createSession(loadModel(res, R.raw.g_synthesis_aravind)),
+            512
+        )
+    }
 
     fun generateImage(
-        res: Resources,
         model: OnnxModel,
         seed: Int,
         psi: FloatArray,
         noise: Float
     ): Pair<FloatArray, LongArray> {
-        onnxGenerator?.close()
-
-        val env = OrtEnvironment.getEnvironment()
         val generator = when (model) {
-            OnnxModel.SKYTNT -> OnnxGenerator(
-                env,
-                env.createSession(loadModel(res, R.raw.g_mapping)),
-                env.createSession(loadModel(res, R.raw.g_synthesis)),
-                1024
-            )
-            OnnxModel.CUSTOM -> OnnxGenerator(
-                env,
-                env.createSession(loadModel(res, R.raw.g_mapping_aravind)),
-                env.createSession(loadModel(res, R.raw.g_synthesis_aravind)),
-                512
-            )
+            OnnxModel.SKYTNT -> skytntGenerator
+            OnnxModel.CUSTOM -> customGenerator
         }
-        val output = generator.generateImage(seed, psi, noise)
-        onnxGenerator = generator
-        return output
+
+        return generator.generateImage(seed, psi, noise)
     }
 
     fun close() {
-        onnxGenerator?.close()
+        skytntGenerator.close()
+        customGenerator.close()
     }
 
     /**

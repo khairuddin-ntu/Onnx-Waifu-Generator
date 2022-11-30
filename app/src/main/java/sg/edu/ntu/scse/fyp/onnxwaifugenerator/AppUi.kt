@@ -4,19 +4,16 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.Checkbox
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +33,7 @@ fun AppUi() {
     val (onnxGenerator, _) = remember { mutableStateOf(OnnxGenerator(resources)) }
 
     val (isGenerating, setIsGenerating) = remember { mutableStateOf(false) }
+    val (model, setModel) = remember { mutableStateOf(OnnxModel.SKYTNT) }
     val (seed, setSeed) = remember { mutableStateOf(0) }
     val (isRandomSeed, setRandomSeed) = remember { mutableStateOf(false) }
     val (trunc1, setTrunc1) = remember { mutableStateOf(1f) }
@@ -112,6 +110,24 @@ fun AppUi() {
             .fillMaxSize()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
+        Text("Model")
+        Spacer(Modifier.padding(bottom = 8.dp))
+        Column(Modifier.selectableGroup()) {
+            OnnxModel.values().forEach { onnxModel ->
+                Row(
+                    Modifier.selectable(
+                        selected = model == onnxModel,
+                        onClick = { setModel(onnxModel) },
+                        role = Role.RadioButton
+                    )
+                ) {
+
+                    RadioButton(selected = model == onnxModel, onClick = null)
+                    Text(onnxModel.label)
+                }
+            }
+        }
+        Spacer(Modifier.padding(bottom = 16.dp))
         LabelledSlider(
             label = "Seed",
             value = seed.toFloat(),

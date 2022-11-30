@@ -37,6 +37,7 @@ fun AppUi() {
     val (isRandomSeed, setRandomSeed) = remember { mutableStateOf(false) }
     val (trunc1, setTrunc1) = remember { mutableStateOf(1f) }
     val (trunc2, setTrunc2) = remember { mutableStateOf(1f) }
+    val (noise, setNoise) = remember { mutableStateOf(0.5f) }
 
     val (image, setImage) = remember { mutableStateOf<Bitmap?>(null) }
 
@@ -74,7 +75,7 @@ fun AppUi() {
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {
             val (modelOutput, shape) = onnxController.generateImage(
-                resources, model, finalSeed, floatArrayOf(trunc1, trunc2), 0f
+                resources, model, finalSeed, floatArrayOf(trunc1, trunc2), noise
             )
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
@@ -157,6 +158,13 @@ fun AppUi() {
             value = trunc2,
             maxValue = 2f,
             onValueChange = setTrunc2,
+            isEnabled = !isGenerating
+        )
+        ModelParamSlider(
+            label = "Noise",
+            value = noise,
+            maxValue = 1f,
+            onValueChange = setNoise,
             isEnabled = !isGenerating
         )
         Button(

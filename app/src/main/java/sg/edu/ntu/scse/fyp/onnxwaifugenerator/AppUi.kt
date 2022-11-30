@@ -28,9 +28,8 @@ private const val TAG = "AppUi"
 @Composable
 fun AppUi() {
     val resources = LocalContext.current.resources
-
     val scope = rememberCoroutineScope()
-    val (onnxGenerator, _) = remember { mutableStateOf(OnnxGenerator(resources)) }
+    val (onnxController, _) = remember { mutableStateOf(OnnxController()) }
 
     val (isGenerating, setIsGenerating) = remember { mutableStateOf(false) }
     val (model, setModel) = remember { mutableStateOf(OnnxModel.SKYTNT) }
@@ -74,8 +73,8 @@ fun AppUi() {
 
         // Performs shape generation in a background thread
         scope.launch(Dispatchers.Default) {
-            val (modelOutput, shape) = onnxGenerator.generateImage(
-                finalSeed, floatArrayOf(trunc1, trunc2), 0f
+            val (modelOutput, shape) = onnxController.generateImage(
+                resources, model, finalSeed, floatArrayOf(trunc1, trunc2), 0f
             )
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
@@ -98,9 +97,9 @@ fun AppUi() {
     }
 
     // Action(s) to perform when UI is destroyed
-    DisposableEffect(onnxGenerator) {
+    DisposableEffect(onnxController) {
         onDispose {
-            onnxGenerator.close()
+            onnxController.close()
         }
     }
 

@@ -3,9 +3,7 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
-import android.content.res.Resources
 import android.util.Log
-import androidx.annotation.RawRes
 import java.nio.FloatBuffer
 import kotlin.random.Random
 
@@ -15,33 +13,16 @@ private const val TAG = "OnnxGenerator"
 
 /**
  * This class contains Onnx-related code to generate images from given models
+ *
+ * @param env Onnx environment
+ * @param mappingFileId Raw resource ID of mapping model
+ * @param synthesisFileId Raw resource ID of synthesis model
  */
-class OnnxGenerator(res: Resources) {
-    /**
-     * Onnx environment
-     */
-    private val env = OrtEnvironment.getEnvironment()
-
-    /**
-     * Mapping model
-     */
-    private val mappingSession: OrtSession
-
-    /**
-     * Synthesis model
-     */
+class OnnxGenerator(
+    private val env: OrtEnvironment,
+    private val mappingSession: OrtSession,
     private val synthesisSession: OrtSession
-
-    init {
-        // Read model files
-        val mappingModel = loadModel(res, R.raw.g_mapping)
-        val synthesisModel = loadModel(res, R.raw.g_synthesis)
-
-        // Load model files into Onnx runtime
-        mappingSession = env.createSession(mappingModel)
-        synthesisSession = env.createSession(synthesisModel)
-    }
-
+) {
     /**
      * Generates an image using models
      *
@@ -93,20 +74,5 @@ class OnnxGenerator(res: Resources) {
     fun close() {
         mappingSession.close()
         synthesisSession.close()
-    }
-
-    /**
-     * Reads model file from raw folder
-     *
-     * @param res Resources object from Android UI
-     * @param rawId Resource ID of model file
-     *
-     * @return Model file as byte array
-     */
-    private fun loadModel(res: Resources, @RawRes rawId: Int): ByteArray {
-        val modelInputStream = res.openRawResource(rawId)
-        val modelBuffer = ByteArray(modelInputStream.available())
-        modelInputStream.read(modelBuffer)
-        return modelBuffer
     }
 }

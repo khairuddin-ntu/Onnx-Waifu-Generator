@@ -3,45 +3,25 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
-import android.content.res.Resources
 import android.util.Log
-import androidx.annotation.RawRes
 import java.nio.FloatBuffer
 import kotlin.random.Random
-
-const val RANDOM_INPUT_SIZE = 1024
 
 private const val TAG = "OnnxGenerator"
 
 /**
  * This class contains Onnx-related code to generate images from given models
+ *
+ * @param env Onnx environment
+ * @param mappingFileId Raw resource ID of mapping model
+ * @param synthesisFileId Raw resource ID of synthesis model
  */
-class OnnxGenerator(res: Resources) {
-    /**
-     * Onnx environment
-     */
-    private val env = OrtEnvironment.getEnvironment()
-
-    /**
-     * Mapping model
-     */
-    private val mappingSession: OrtSession
-
-    /**
-     * Synthesis model
-     */
-    private val synthesisSession: OrtSession
-
-    init {
-        // Read model files
-        val mappingModel = loadModel(res, R.raw.g_mapping)
-        val synthesisModel = loadModel(res, R.raw.g_synthesis)
-
-        // Load model files into Onnx runtime
-        mappingSession = env.createSession(mappingModel)
-        synthesisSession = env.createSession(synthesisModel)
-    }
-
+class OnnxGenerator(
+    private val env: OrtEnvironment,
+    private val mappingSession: OrtSession,
+    private val synthesisSession: OrtSession,
+    private val zSize: Int
+) {
     /**
      * Generates an image using models
      *
@@ -58,8 +38,8 @@ class OnnxGenerator(res: Resources) {
         val ran = Random(seed)
 
         // Run mapping
-        val zBuffer = FloatBuffer.wrap(FloatArray(RANDOM_INPUT_SIZE) { ran.nextFloat() })
-        val zTensor = OnnxTensor.createTensor(env, zBuffer, longArrayOf(1, RANDOM_INPUT_SIZE.toLong()))
+        val zBuffer = FloatBuffer.wrap(FloatArray(zSize) { ran.nextFloat() })
+        val zTensor = OnnxTensor.createTensor(env, zBuffer, longArrayOf(1, zSize.toLong()))
 
         val psiBuffer = FloatBuffer.wrap(psi)
         val psiTensor = OnnxTensor.createTensor(env, psiBuffer, longArrayOf(psi.size.toLong()))
@@ -93,20 +73,5 @@ class OnnxGenerator(res: Resources) {
     fun close() {
         mappingSession.close()
         synthesisSession.close()
-    }
-
-    /**
-     * Reads model file from raw folder
-     *
-     * @param res Resources object from Android UI
-     * @param rawId Resource ID of model file
-     *
-     * @return Model file as byte array
-     */
-    private fun loadModel(res: Resources, @RawRes rawId: Int): ByteArray {
-        val modelInputStream = res.openRawResource(rawId)
-        val modelBuffer = ByteArray(modelInputStream.available())
-        modelInputStream.read(modelBuffer)
-        return modelBuffer
     }
 }

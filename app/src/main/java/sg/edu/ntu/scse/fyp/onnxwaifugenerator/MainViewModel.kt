@@ -29,7 +29,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         onnxController.close()
     }
 
-    fun generateShape(
+    fun generateImage(
         modelType: OnnxModel, seed: Int, psi: FloatArray, noise: Float
     ) {
         isGenerating = true

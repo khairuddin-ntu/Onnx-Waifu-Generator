@@ -41,7 +41,7 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
         }
 
         // Performs shape generation in a background thread
-        mainViewModel.generateShape(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
+        mainViewModel.generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
     }
 
     // UI

@@ -1,38 +1,29 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.math.roundToInt
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlin.random.Random
-
-private const val TAG = "AppUi"
 
 /**
  * Main UI
  */
 @Composable
-fun AppUi() {
-    val resources = LocalContext.current.resources
-    val scope = rememberCoroutineScope()
-    val (onnxController, _) = remember { mutableStateOf(OnnxController(resources)) }
+fun AppUi(mainViewModel: MainViewModel = viewModel()) {
+    val isGenerating = mainViewModel.isGenerating
+    val generatedImage = mainViewModel.generatedImage
 
-    val (isGenerating, setIsGenerating) = remember { mutableStateOf(false) }
     val (model, setModel) = remember { mutableStateOf(OnnxModel.SKYTNT) }
     val (seed, setSeed) = remember { mutableStateOf(0) }
     val (isRandomSeed, setRandomSeed) = remember { mutableStateOf(false) }
@@ -40,31 +31,7 @@ fun AppUi() {
     val (trunc2, setTrunc2) = remember { mutableStateOf(1f) }
     val (noise, setNoise) = remember { mutableStateOf(0.5f) }
 
-    val (image, setImage) = remember { mutableStateOf<Bitmap?>(null) }
-
-    // Converts model output to Bitmap
-    val modelToBitmap = { modelOutput: FloatArray, imgWidth: Int, imgHeight: Int ->
-        val minVal = modelOutput.minOrNull() ?: -1.0f
-        val maxVal = modelOutput.maxOrNull() ?: 1.0f
-        val delta = maxVal - minVal
-
-        val pixels = IntArray(imgWidth * imgHeight * 4)
-        for (i in 0 until imgWidth * imgHeight) {
-            pixels[i] = Color.rgb(
-                ((modelOutput[i] - minVal) / delta * 255.0f).roundToInt(),
-                ((modelOutput[i + imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt(),
-                ((modelOutput[i + 2 * imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt()
-            )
-        }
-
-        val bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.ARGB_8888)
-        bitmap.setPixels(pixels, 0, imgWidth, 0, 0, imgWidth, imgHeight)
-        bitmap
-    }
-
     val generateShape: () -> Unit = {
-        setIsGenerating(true)
-
         val finalSeed: Int
         if (isRandomSeed) {
             finalSeed = Random.nextInt(0, Int.MAX_VALUE)
@@ -74,38 +41,7 @@ fun AppUi() {
         }
 
         // Performs shape generation in a background thread
-        scope.launch(Dispatchers.Default) {
-            val (modelOutput, shape) = onnxController.generateImage(
-                model, finalSeed, floatArrayOf(trunc1, trunc2), noise
-            )
-
-            Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
-            val imgWidth = shape[3].toInt()
-            val imgHeight = shape[2].toInt()
-
-            val bitmap = modelToBitmap(modelOutput, imgWidth, imgHeight)
-
-            withContext(Dispatchers.Main) {
-                setImage(bitmap)
-                setIsGenerating(false)
-            }
-
-            // Save to file in app storage
-//        val fileName = "model-output-${System.currentTimeMillis()}.png"
-//        val file = File(applicationContext.filesDir, fileName)
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
-//        Log.d(
-//            TAG,
-//            "generateShape: Bitmap stored in ${applicationContext.filesDir.absolutePath}/$fileName"
-//        )
-        }
-    }
-
-    // Action(s) to perform when UI is destroyed
-    DisposableEffect(onnxController) {
-        onDispose {
-            onnxController.close()
-        }
+        mainViewModel.generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
     }
 
     // UI
@@ -185,10 +121,10 @@ fun AppUi() {
         if (isGenerating) {
             CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
         }
-        if (image != null && !isGenerating) {
+        if (generatedImage != null && !isGenerating) {
             Image(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                bitmap = image.asImageBitmap(),
+                bitmap = generatedImage.asImageBitmap(),
                 contentDescription = ""
             )
         }

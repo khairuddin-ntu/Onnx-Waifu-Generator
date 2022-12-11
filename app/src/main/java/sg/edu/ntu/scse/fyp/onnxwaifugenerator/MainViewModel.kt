@@ -8,7 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
@@ -18,29 +20,43 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var isGenerating by mutableStateOf(false)
         private set
 
+    var generatedImage by mutableStateOf<Bitmap?>(null)
+        private set
+
     private val onnxController = OnnxController(app.resources)
 
     override fun onCleared() {
         onnxController.close()
     }
 
-    suspend fun generateShape(
+    fun generateShape(
         modelType: OnnxModel, seed: Int, psi: FloatArray, noise: Float
-    ): Bitmap {
+    ) {
         isGenerating = true
 
-        val bitmap = withContext(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.Default) {
             val (modelOutput, shape) = onnxController.generateImage(modelType, seed, psi, noise)
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
             val imgWidth = shape[3].toInt()
             val imgHeight = shape[2].toInt()
 
-            convertModelToBitmap(modelOutput, imgWidth, imgHeight)
-        }
+            val bitmap = convertModelToBitmap(modelOutput, imgWidth, imgHeight)
 
-        isGenerating = false
-        return bitmap
+            withContext(Dispatchers.Main) {
+                generatedImage = bitmap
+                isGenerating = false
+            }
+
+            // Save to file in app storage
+//        val fileName = "model-output-${System.currentTimeMillis()}.png"
+//        val file = File(applicationContext.filesDir, fileName)
+//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
+//        Log.d(
+//            TAG,
+//            "generateShape: Bitmap stored in ${applicationContext.filesDir.absolutePath}/$fileName"
+//        )
+        }
     }
 
     private fun convertModelToBitmap(

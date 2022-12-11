@@ -1,6 +1,5 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
@@ -9,14 +8,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /**
@@ -24,17 +21,15 @@ import kotlin.random.Random
  */
 @Composable
 fun AppUi(mainViewModel: MainViewModel = viewModel()) {
-    val scope = rememberCoroutineScope()
-
     val isGenerating = mainViewModel.isGenerating
+    val generatedImage = mainViewModel.generatedImage
+
     val (model, setModel) = remember { mutableStateOf(OnnxModel.SKYTNT) }
     val (seed, setSeed) = remember { mutableStateOf(0) }
     val (isRandomSeed, setRandomSeed) = remember { mutableStateOf(false) }
     val (trunc1, setTrunc1) = remember { mutableStateOf(1f) }
     val (trunc2, setTrunc2) = remember { mutableStateOf(1f) }
     val (noise, setNoise) = remember { mutableStateOf(0.5f) }
-
-    val (image, setImage) = remember { mutableStateOf<Bitmap?>(null) }
 
     val generateShape: () -> Unit = {
         val finalSeed: Int
@@ -46,21 +41,7 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
         }
 
         // Performs shape generation in a background thread
-        scope.launch {
-            val bitmap = mainViewModel.generateShape(
-                model, finalSeed, floatArrayOf(trunc1, trunc2), noise
-            )
-            setImage(bitmap)
-
-            // Save to file in app storage
-//        val fileName = "model-output-${System.currentTimeMillis()}.png"
-//        val file = File(applicationContext.filesDir, fileName)
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
-//        Log.d(
-//            TAG,
-//            "generateShape: Bitmap stored in ${applicationContext.filesDir.absolutePath}/$fileName"
-//        )
-        }
+        mainViewModel.generateShape(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
     }
 
     // UI
@@ -140,10 +121,10 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
         if (isGenerating) {
             CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
         }
-        if (image != null && !isGenerating) {
+        if (generatedImage != null && !isGenerating) {
             Image(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                bitmap = image.asImageBitmap(),
+                bitmap = generatedImage.asImageBitmap(),
                 contentDescription = ""
             )
         }

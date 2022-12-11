@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -24,18 +22,18 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
     val isGenerating = mainViewModel.isGenerating
     val generatedImage = mainViewModel.generatedImage
 
-    val (model, setModel) = remember { mutableStateOf(OnnxModel.SKYTNT) }
-    val (seed, setSeed) = remember { mutableStateOf(0) }
-    val (isRandomSeed, setRandomSeed) = remember { mutableStateOf(false) }
-    val (trunc1, setTrunc1) = remember { mutableStateOf(1f) }
-    val (trunc2, setTrunc2) = remember { mutableStateOf(1f) }
-    val (noise, setNoise) = remember { mutableStateOf(0.5f) }
+    var model by remember { mutableStateOf(OnnxModel.SKYTNT) }
+    var seed by remember { mutableStateOf(0) }
+    var isRandomSeed by remember { mutableStateOf(false) }
+    var trunc1 by remember { mutableStateOf(1f) }
+    var trunc2 by remember { mutableStateOf(1f) }
+    var noise by remember { mutableStateOf(0.5f) }
 
     val generateShape: () -> Unit = {
         val finalSeed: Int
         if (isRandomSeed) {
             finalSeed = Random.nextInt(0, Int.MAX_VALUE)
-            setSeed(finalSeed)
+            seed = finalSeed
         } else {
             finalSeed = seed
         }
@@ -57,7 +55,7 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
                 Row(
                     Modifier.selectable(
                         selected = model == onnxModel,
-                        onClick = { setModel(onnxModel) },
+                        onClick = { model = onnxModel },
                         role = Role.RadioButton,
                         enabled = !isGenerating
                     )
@@ -77,7 +75,7 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
             label = "Seed",
             value = seed.toFloat(),
             valueRange = 0f..Int.MAX_VALUE.toFloat(),
-            onValueChange = { setSeed(it.toInt()) },
+            onValueChange = { seed = it.toInt() },
             isEnabled = !isGenerating && !isRandomSeed
         )
         Row(
@@ -86,7 +84,7 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
         ) {
             Checkbox(
                 checked = isRandomSeed,
-                onCheckedChange = setRandomSeed,
+                onCheckedChange = { isRandomSeed = it },
                 enabled = !isGenerating
             )
             Text("Random")
@@ -95,21 +93,21 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
             label = "Truncation 1",
             value = trunc1,
             maxValue = 2f,
-            onValueChange = setTrunc1,
+            onValueChange = { trunc1 = it },
             isEnabled = !isGenerating
         )
         ModelParamSlider(
             label = "Truncation 2",
             value = trunc2,
             maxValue = 2f,
-            onValueChange = setTrunc2,
+            onValueChange = { trunc2 = it },
             isEnabled = !isGenerating
         )
         ModelParamSlider(
             label = "Noise",
             value = noise,
             maxValue = 1f,
-            onValueChange = setNoise,
+            onValueChange = { noise = it },
             isEnabled = !isGenerating
         )
         Button(

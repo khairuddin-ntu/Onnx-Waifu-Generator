@@ -4,6 +4,9 @@ import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,6 +15,9 @@ import kotlin.math.roundToInt
 private const val TAG = "MainViewModel"
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
+    var isGenerating by mutableStateOf(false)
+        private set
+
     private val onnxController = OnnxController(app.resources)
 
     override fun onCleared() {
@@ -20,14 +26,21 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     suspend fun generateShape(
         modelType: OnnxModel, seed: Int, psi: FloatArray, noise: Float
-    ) = withContext(Dispatchers.Default) {
-        val (modelOutput, shape) = onnxController.generateImage(modelType, seed, psi, noise)
+    ): Bitmap {
+        isGenerating = true
 
-        Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
-        val imgWidth = shape[3].toInt()
-        val imgHeight = shape[2].toInt()
+        val bitmap = withContext(Dispatchers.Default) {
+            val (modelOutput, shape) = onnxController.generateImage(modelType, seed, psi, noise)
 
-        convertModelToBitmap(modelOutput, imgWidth, imgHeight)
+            Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
+            val imgWidth = shape[3].toInt()
+            val imgHeight = shape[2].toInt()
+
+            convertModelToBitmap(modelOutput, imgWidth, imgHeight)
+        }
+
+        isGenerating = false
+        return bitmap
     }
 
     private fun convertModelToBitmap(

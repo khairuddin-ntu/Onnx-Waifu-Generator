@@ -26,7 +26,7 @@ import kotlin.random.Random
 fun AppUi(mainViewModel: MainViewModel = viewModel()) {
     val scope = rememberCoroutineScope()
 
-    val (isGenerating, setIsGenerating) = remember { mutableStateOf(false) }
+    val isGenerating = mainViewModel.isGenerating
     val (model, setModel) = remember { mutableStateOf(OnnxModel.SKYTNT) }
     val (seed, setSeed) = remember { mutableStateOf(0) }
     val (isRandomSeed, setRandomSeed) = remember { mutableStateOf(false) }
@@ -37,8 +37,6 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
     val (image, setImage) = remember { mutableStateOf<Bitmap?>(null) }
 
     val generateShape: () -> Unit = {
-        setIsGenerating(true)
-
         val finalSeed: Int
         if (isRandomSeed) {
             finalSeed = Random.nextInt(0, Int.MAX_VALUE)
@@ -52,9 +50,7 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
             val bitmap = mainViewModel.generateShape(
                 model, finalSeed, floatArrayOf(trunc1, trunc2), noise
             )
-
             setImage(bitmap)
-            setIsGenerating(false)
 
             // Save to file in app storage
 //        val fileName = "model-output-${System.currentTimeMillis()}.png"

@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlin.random.Random
 
+private const val MAX_SEED_VALUE = 100_000
+
 /**
  * Main UI
  */
@@ -32,7 +34,7 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
     val generateShape: () -> Unit = {
         val finalSeed: Int
         if (isRandomSeed) {
-            finalSeed = Random.nextInt(0, Int.MAX_VALUE)
+            finalSeed = Random.nextInt(0, MAX_SEED_VALUE)
             seed = finalSeed
         } else {
             finalSeed = seed
@@ -74,7 +76,7 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
         LabelledSlider(
             label = "Seed",
             value = seed.toFloat(),
-            valueRange = 0f..Int.MAX_VALUE.toFloat(),
+            valueRange = 0f..(MAX_SEED_VALUE.toFloat()),
             onValueChange = { seed = it.toInt() },
             isEnabled = !isGenerating && !isRandomSeed
         )

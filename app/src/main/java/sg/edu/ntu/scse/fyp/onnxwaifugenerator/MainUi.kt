@@ -20,7 +20,7 @@ private const val MAX_SEED_VALUE = 100_000
  * Main UI
  */
 @Composable
-fun AppUi(mainViewModel: MainViewModel = viewModel()) {
+fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     val isGenerating = mainViewModel.isGenerating
     val generatedImage = mainViewModel.generatedImage
 
@@ -40,7 +40,6 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
             finalSeed = seed
         }
 
-        // Performs shape generation in a background thread
         mainViewModel.generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
     }
 
@@ -62,7 +61,6 @@ fun AppUi(mainViewModel: MainViewModel = viewModel()) {
                         enabled = !isGenerating
                     )
                 ) {
-
                     RadioButton(
                         selected = model == onnxModel,
                         onClick = null,

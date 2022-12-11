@@ -34,6 +34,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     ) {
         isGenerating = true
 
+        // Performs shape generation in a background thread
         viewModelScope.launch(Dispatchers.Default) {
             val (modelOutput, shape) = onnxController.generateImage(modelType, seed, psi, noise)
 

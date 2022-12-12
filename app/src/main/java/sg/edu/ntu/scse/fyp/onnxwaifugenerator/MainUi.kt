@@ -8,10 +8,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
 import kotlin.random.Random
 
 private const val MAX_SEED_VALUE = 100_000
@@ -120,9 +120,10 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
         }
         if (generatedImage != null && !isGenerating) {
+            val painter = rememberAsyncImagePainter(generatedImage)
             Image(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                bitmap = generatedImage.asImageBitmap(),
+                painter = painter,
                 contentDescription = ""
             )
         }

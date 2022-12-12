@@ -21,7 +21,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var isGenerating by mutableStateOf(false)
         private set
 
-    var generatedImage by mutableStateOf<Bitmap?>(null)
+    var generatedImage by mutableStateOf<File?>(null)
         private set
 
     private val onnxController = OnnxController(app.resources)
@@ -58,7 +58,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             Log.d(TAG, "generateShape: Bitmap stored in ${imageListDir.absolutePath}/$fileName")
 
             withContext(Dispatchers.Main) {
-                generatedImage = bitmap
+                generatedImage = file
                 isGenerating = false
             }
         }

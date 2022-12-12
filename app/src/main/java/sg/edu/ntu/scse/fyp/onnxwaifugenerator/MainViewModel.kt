@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.math.roundToInt
 
 private const val TAG = "MainViewModel"
@@ -24,6 +25,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         private set
 
     private val onnxController = OnnxController(app.resources)
+    private val imageListDir = File(app.filesDir, "generated_images")
+
+    init {
+        if (!imageListDir.exists()) {
+            imageListDir.mkdir()
+        }
+    }
 
     override fun onCleared() {
         onnxController.close()
@@ -43,20 +51,16 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             val imgHeight = shape[2].toInt()
 
             val bitmap = convertModelToBitmap(modelOutput, imgWidth, imgHeight)
+            // Save to file in app storage
+            val fileName = "model-output-${System.currentTimeMillis()}.png"
+            val file = File(imageListDir, fileName)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
+            Log.d(TAG, "generateShape: Bitmap stored in ${imageListDir.absolutePath}/$fileName")
 
             withContext(Dispatchers.Main) {
                 generatedImage = bitmap
                 isGenerating = false
             }
-
-            // Save to file in app storage
-//        val fileName = "model-output-${System.currentTimeMillis()}.png"
-//        val file = File(applicationContext.filesDir, fileName)
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
-//        Log.d(
-//            TAG,
-//            "generateShape: Bitmap stored in ${applicationContext.filesDir.absolutePath}/$fileName"
-//        )
         }
     }
 

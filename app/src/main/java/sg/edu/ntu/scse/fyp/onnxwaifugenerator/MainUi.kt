@@ -28,6 +28,10 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     val isGenerating = mainViewModel.isGenerating
     val generatedImages = mainViewModel.imageList
 
+    val pagerState = rememberPagerState(
+        if (generatedImages != null) generatedImages.size - 1 else 0
+    )
+
     var model by remember { mutableStateOf(OnnxModel.SKYTNT) }
     var seed by remember { mutableStateOf(0) }
     var isRandomSeed by remember { mutableStateOf(false) }
@@ -45,6 +49,10 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         }
 
         mainViewModel.generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
+    }
+
+    LaunchedEffect(generatedImages) {
+        pagerState.scrollToPage(if (generatedImages != null) generatedImages.size - 1 else 0)
     }
 
     // UI
@@ -124,8 +132,6 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
         }
         if (generatedImages != null && !isGenerating) {
-            val pagerState = rememberPagerState(generatedImages.size - 1)
-
             HorizontalPager(count = generatedImages.size, state = pagerState) { i ->
                 val painter = rememberAsyncImagePainter(generatedImages[i])
                 Image(

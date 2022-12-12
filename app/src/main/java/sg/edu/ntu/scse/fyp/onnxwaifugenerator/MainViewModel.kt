@@ -51,13 +51,18 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
             val imgWidth = shape[3].toInt()
             val imgHeight = shape[2].toInt()
-
             val bitmap = convertModelToBitmap(modelOutput, imgWidth, imgHeight)
+
             // Save to file in app storage
-            val fileName = "model-output-${System.currentTimeMillis()}.png"
-            val file = File(imageListDir, fileName)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
-            Log.d(TAG, "generateShape: Bitmap stored in ${imageListDir.absolutePath}/$fileName")
+            withContext(Dispatchers.IO) {
+                val file = File(imageListDir, "model-output-${System.currentTimeMillis()}.png")
+                val fileOutputStream = file.outputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+                fileOutputStream.close()
+                Log.d(TAG, "generateShape: Bitmap stored in ${file.absolutePath}")
+            }
+
+            bitmap.recycle()
 
             withContext(Dispatchers.Main) {
                 imageList = imageListDir.listFiles()?.sorted()

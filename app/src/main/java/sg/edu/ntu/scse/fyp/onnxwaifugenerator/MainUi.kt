@@ -12,6 +12,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
 import kotlin.random.Random
 
 private const val MAX_SEED_VALUE = 100_000
@@ -19,6 +21,7 @@ private const val MAX_SEED_VALUE = 100_000
 /**
  * Main UI
  */
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     val isGenerating = mainViewModel.isGenerating
@@ -120,12 +123,14 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
         }
         if (generatedImage != null && !isGenerating) {
-            val painter = rememberAsyncImagePainter(generatedImage)
-            Image(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                painter = painter,
-                contentDescription = ""
-            )
+            HorizontalPager(count = 1) { i ->
+                val painter = rememberAsyncImagePainter(generatedImage)
+                Image(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    painter = painter,
+                    contentDescription = ""
+                )
+            }
         }
     }
 }

@@ -21,7 +21,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var isGenerating by mutableStateOf(false)
         private set
 
-    var generatedImage by mutableStateOf<File?>(null)
+    var imageList by mutableStateOf<List<File>?>(null)
         private set
 
     private val onnxController = OnnxController(app.resources)
@@ -31,6 +31,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         if (!imageListDir.exists()) {
             imageListDir.mkdir()
         }
+
+        imageList = imageListDir.listFiles()?.sorted()
     }
 
     override fun onCleared() {
@@ -58,7 +60,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             Log.d(TAG, "generateShape: Bitmap stored in ${imageListDir.absolutePath}/$fileName")
 
             withContext(Dispatchers.Main) {
-                generatedImage = file
+                imageList = imageListDir.listFiles()?.sorted()
                 isGenerating = false
             }
         }

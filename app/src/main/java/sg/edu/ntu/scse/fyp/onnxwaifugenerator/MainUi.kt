@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import kotlin.random.Random
 
 private const val MAX_SEED_VALUE = 100_000
@@ -25,7 +26,7 @@ private const val MAX_SEED_VALUE = 100_000
 @Composable
 fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     val isGenerating = mainViewModel.isGenerating
-    val generatedImage = mainViewModel.generatedImage
+    val generatedImages = mainViewModel.imageList
 
     var model by remember { mutableStateOf(OnnxModel.SKYTNT) }
     var seed by remember { mutableStateOf(0) }
@@ -122,11 +123,13 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         if (isGenerating) {
             CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
         }
-        if (generatedImage != null && !isGenerating) {
-            HorizontalPager(count = 1) { i ->
-                val painter = rememberAsyncImagePainter(generatedImage)
+        if (generatedImages != null && !isGenerating) {
+            val pagerState = rememberPagerState(generatedImages.size - 1)
+
+            HorizontalPager(count = generatedImages.size, state = pagerState) { i ->
+                val painter = rememberAsyncImagePainter(generatedImages[i])
                 Image(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    modifier = Modifier.fillMaxWidth(),
                     painter = painter,
                     contentDescription = ""
                 )

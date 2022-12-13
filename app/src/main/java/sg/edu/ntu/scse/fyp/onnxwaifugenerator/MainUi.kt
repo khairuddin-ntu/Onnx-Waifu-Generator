@@ -19,8 +19,6 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlin.random.Random
 
-private const val MAX_SEED_VALUE = 100_000
-
 /**
  * Main UI
  */
@@ -33,7 +31,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     val pagerState = rememberPagerState(generatedImages?.lastIndex ?: 0)
 
     var model by rememberSaveable { mutableStateOf(OnnxModel.SKYTNT) }
-    var seed by rememberSaveable { mutableStateOf(0) }
+    val (seed, setSeed) = rememberSaveable { mutableStateOf(0) }
     var isRandomSeed by rememberSaveable { mutableStateOf(false) }
     var trunc1 by rememberSaveable { mutableStateOf(1f) }
     var trunc2 by rememberSaveable { mutableStateOf(1f) }
@@ -43,7 +41,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         val finalSeed: Int
         if (isRandomSeed) {
             finalSeed = Random.nextInt(0, MAX_SEED_VALUE)
-            seed = finalSeed
+            setSeed(finalSeed)
         } else {
             finalSeed = seed
         }
@@ -83,11 +81,9 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             }
         }
         Spacer(Modifier.padding(bottom = 16.dp))
-        LabelledSlider(
-            label = "Seed",
-            value = seed.toFloat(),
-            valueRange = 0f..(MAX_SEED_VALUE.toFloat()),
-            onValueChange = { seed = it.toInt() },
+        SeedSlider(
+            seedValue = seed,
+            setSeed = setSeed,
             isEnabled = !isGenerating && !isRandomSeed
         )
         Row(
@@ -101,21 +97,21 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             )
             Text("Random")
         }
-        ModelParamSlider(
+        FloatParamSlider(
             label = "Truncation 1",
             value = trunc1,
             maxValue = 2f,
             onValueChange = { trunc1 = it },
             isEnabled = !isGenerating
         )
-        ModelParamSlider(
+        FloatParamSlider(
             label = "Truncation 2",
             value = trunc2,
             maxValue = 2f,
             onValueChange = { trunc2 = it },
             isEnabled = !isGenerating
         )
-        ModelParamSlider(
+        FloatParamSlider(
             label = "Noise",
             value = noise,
             maxValue = 1f,

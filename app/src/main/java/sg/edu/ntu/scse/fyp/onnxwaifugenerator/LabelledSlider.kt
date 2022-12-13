@@ -8,12 +8,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun LabelledSlider(
+fun SeedSlider(
+    seedValue: Int,
+    setSeed: (Int) -> Unit,
+    isEnabled: Boolean
+) {
+    Row {
+        Text("Seed")
+        Spacer(Modifier.weight(1f))
+        Text(seedValue.toString())
+    }
+    Slider(
+        value = seedValue.toFloat(),
+        valueRange = 0f..(MAX_SEED_VALUE.toFloat()),
+        onValueChange = { setSeed(it.toInt()) },
+        enabled = isEnabled
+    )
+}
+
+@Composable
+fun FloatParamSlider(
     label: String,
     value: Float,
-    valueRange: ClosedFloatingPointRange<Float>,
+    maxValue: Float,
     onValueChange: (Float) -> Unit,
-    steps: Int = 0,
     isEnabled: Boolean
 ) {
     Row {
@@ -23,27 +41,9 @@ fun LabelledSlider(
     }
     Slider(
         value = value,
-        valueRange = valueRange,
-        onValueChange = onValueChange,
-        steps = steps,
-        enabled = isEnabled
-    )
-}
-
-@Composable
-fun ModelParamSlider(
-    label: String,
-    value: Float,
-    maxValue: Float,
-    onValueChange: (Float) -> Unit,
-    isEnabled: Boolean
-) {
-    LabelledSlider(
-        label = label,
-        value = value,
         valueRange = 0f..maxValue,
         onValueChange = onValueChange,
         steps = (maxValue / 0.1f).toInt() - 1,
-        isEnabled = isEnabled
+        enabled = isEnabled
     )
 }

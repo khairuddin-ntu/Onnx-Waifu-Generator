@@ -8,15 +8,18 @@ import androidx.compose.ui.Modifier
 @Composable
 fun ModelSelector(
     selectedModel: OnnxModel,
-    setModel: (OnnxModel) -> Unit
+    setModel: (OnnxModel) -> Unit,
+    enabled: Boolean
 ) {
     val options = OnnxModel.values()
-    var expanded by remember { mutableStateOf(false) }
+    var shouldExpand by remember { mutableStateOf(false) }
+
+    val expanded = if (!enabled) false else shouldExpand
 
     // We want to react on tap/press on TextField to show menu
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
+        onExpandedChange = { shouldExpand = !shouldExpand },
     ) {
         TextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
@@ -30,14 +33,14 @@ fun ModelSelector(
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onDismissRequest = { shouldExpand = false },
         ) {
             options.forEach { selectionOption ->
                 DropdownMenuItem(
                     text = { Text(selectionOption.label) },
                     onClick = {
                         setModel(selectionOption)
-                        expanded = false
+                        shouldExpand = false
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                 )

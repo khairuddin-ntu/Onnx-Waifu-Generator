@@ -127,6 +127,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         ) {
             Text(text = "Generate")
         }
+        Spacer(Modifier.padding(top = 8.dp))
         Box(
             Modifier
                 .fillMaxWidth()

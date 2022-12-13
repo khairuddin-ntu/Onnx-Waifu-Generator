@@ -1,5 +1,6 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -23,7 +24,7 @@ fun ModelSelector(
     ) {
         TextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor().fillMaxWidth(),
             readOnly = true,
             value = selectedModel.label,
             onValueChange = {},

@@ -6,6 +6,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -31,12 +32,12 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
 
     val pagerState = rememberPagerState(generatedImages?.lastIndex ?: 0)
 
-    var model by remember { mutableStateOf(OnnxModel.SKYTNT) }
-    var seed by remember { mutableStateOf(0) }
-    var isRandomSeed by remember { mutableStateOf(false) }
-    var trunc1 by remember { mutableStateOf(1f) }
-    var trunc2 by remember { mutableStateOf(1f) }
-    var noise by remember { mutableStateOf(0.5f) }
+    var model by rememberSaveable { mutableStateOf(OnnxModel.SKYTNT) }
+    var seed by rememberSaveable { mutableStateOf(0) }
+    var isRandomSeed by rememberSaveable { mutableStateOf(false) }
+    var trunc1 by rememberSaveable { mutableStateOf(1f) }
+    var trunc2 by rememberSaveable { mutableStateOf(1f) }
+    var noise by rememberSaveable { mutableStateOf(0.5f) }
 
     val generateShape: () -> Unit = {
         val finalSeed: Int

@@ -133,7 +133,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
                 .height(with(LocalDensity.current) { 1024.toDp() })
         ) {
             if (isGenerating) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(Modifier.align(Alignment.TopCenter))
             } else if (generatedImages != null) {
                 HorizontalPager(
                     modifier = Modifier.fillMaxSize(),

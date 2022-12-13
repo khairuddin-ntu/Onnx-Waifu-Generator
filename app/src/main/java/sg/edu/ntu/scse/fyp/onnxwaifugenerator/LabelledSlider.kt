@@ -19,7 +19,7 @@ fun LabelledSlider(
     Row {
         Text(label)
         Spacer(Modifier.weight(1f))
-        Text(value.toString())
+        Text(String.format("%.1f", value))
     }
     Slider(
         value = value,

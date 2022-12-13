@@ -8,10 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import kotlin.random.Random
 
 private const val MAX_SEED_VALUE = 100_000
@@ -19,10 +23,13 @@ private const val MAX_SEED_VALUE = 100_000
 /**
  * Main UI
  */
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     val isGenerating = mainViewModel.isGenerating
-    val generatedImage = mainViewModel.generatedImage
+    val generatedImages = mainViewModel.imageList
+
+    val pagerState = rememberPagerState(generatedImages?.lastIndex ?: 0)
 
     var model by remember { mutableStateOf(OnnxModel.SKYTNT) }
     var seed by remember { mutableStateOf(0) }
@@ -41,6 +48,10 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         }
 
         mainViewModel.generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
+    }
+
+    LaunchedEffect(generatedImages) {
+        pagerState.scrollToPage(generatedImages?.lastIndex ?: 0)
     }
 
     // UI
@@ -116,15 +127,27 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         ) {
             Text(text = "Generate")
         }
-        if (isGenerating) {
-            CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
-        }
-        if (generatedImage != null && !isGenerating) {
-            Image(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                bitmap = generatedImage.asImageBitmap(),
-                contentDescription = ""
-            )
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(with(LocalDensity.current) { 1024.toDp() })
+        ) {
+            if (isGenerating) {
+                CircularProgressIndicator(Modifier.align(Alignment.TopCenter))
+            } else if (generatedImages != null) {
+                HorizontalPager(
+                    modifier = Modifier.fillMaxSize(),
+                    count = generatedImages.size,
+                    state = pagerState
+                ) { i ->
+                    val painter = rememberAsyncImagePainter(generatedImages[i])
+                    Image(
+                        modifier = Modifier.fillMaxWidth(),
+                        painter = painter,
+                        contentDescription = ""
+                    )
+                }
+            }
         }
     }
 }

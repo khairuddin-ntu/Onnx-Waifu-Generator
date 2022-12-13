@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.math.roundToInt
 
 private const val TAG = "MainViewModel"
@@ -20,10 +21,19 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var isGenerating by mutableStateOf(false)
         private set
 
-    var generatedImage by mutableStateOf<Bitmap?>(null)
+    var imageList by mutableStateOf<List<File>?>(null)
         private set
 
     private val onnxController = OnnxController(app.resources)
+    private val imageListDir = File(app.filesDir, "generated_images")
+
+    init {
+        if (!imageListDir.exists()) {
+            imageListDir.mkdir()
+        }
+
+        imageList = imageListDir.listFiles()?.sorted()
+    }
 
     override fun onCleared() {
         onnxController.close()
@@ -41,22 +51,23 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
             val imgWidth = shape[3].toInt()
             val imgHeight = shape[2].toInt()
-
             val bitmap = convertModelToBitmap(modelOutput, imgWidth, imgHeight)
 
-            withContext(Dispatchers.Main) {
-                generatedImage = bitmap
-                isGenerating = false
+            // Save to file in app storage
+            withContext(Dispatchers.IO) {
+                val file = File(imageListDir, "model-output-${System.currentTimeMillis()}.png")
+                val fileOutputStream = file.outputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+                fileOutputStream.close()
+                Log.d(TAG, "generateShape: Bitmap stored in ${file.absolutePath}")
             }
 
-            // Save to file in app storage
-//        val fileName = "model-output-${System.currentTimeMillis()}.png"
-//        val file = File(applicationContext.filesDir, fileName)
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
-//        Log.d(
-//            TAG,
-//            "generateShape: Bitmap stored in ${applicationContext.filesDir.absolutePath}/$fileName"
-//        )
+            bitmap.recycle()
+
+            withContext(Dispatchers.Main) {
+                imageList = imageListDir.listFiles()?.sorted()
+                isGenerating = false
+            }
         }
     }
 

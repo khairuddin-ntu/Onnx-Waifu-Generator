@@ -30,6 +30,7 @@ fun ModelSelector(
             label = { Text("Model") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            enabled = enabled
         )
         ExposedDropdownMenu(
             expanded = expanded,

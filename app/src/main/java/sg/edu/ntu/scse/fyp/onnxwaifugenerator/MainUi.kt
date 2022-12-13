@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -126,17 +127,26 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         ) {
             Text(text = "Generate")
         }
-        if (isGenerating) {
-            CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
-        }
-        if (generatedImages != null && !isGenerating) {
-            HorizontalPager(count = generatedImages.size, state = pagerState) { i ->
-                val painter = rememberAsyncImagePainter(generatedImages[i])
-                Image(
-                    modifier = Modifier.fillMaxWidth(),
-                    painter = painter,
-                    contentDescription = ""
-                )
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(with(LocalDensity.current) { 1024.toDp() })
+        ) {
+            if (isGenerating) {
+                CircularProgressIndicator()
+            } else if (generatedImages != null) {
+                HorizontalPager(
+                    modifier = Modifier.fillMaxSize(),
+                    count = generatedImages.size,
+                    state = pagerState
+                ) { i ->
+                    val painter = rememberAsyncImagePainter(generatedImages[i])
+                    Image(
+                        modifier = Modifier.fillMaxWidth(),
+                        painter = painter,
+                        contentDescription = ""
+                    )
+                }
             }
         }
     }

@@ -2,15 +2,12 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
@@ -30,7 +27,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
 
     val pagerState = rememberPagerState(generatedImages?.lastIndex ?: 0)
 
-    var model by rememberSaveable { mutableStateOf(OnnxModel.SKYTNT) }
+    val (model, setModel) = rememberSaveable { mutableStateOf(OnnxModel.SKYTNT) }
     val (seed, setSeed) = rememberSaveable { mutableStateOf(0) }
     var isRandomSeed by rememberSaveable { mutableStateOf(false) }
     var trunc1 by rememberSaveable { mutableStateOf(1f) }
@@ -59,27 +56,11 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             .fillMaxSize()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
-        Text("Model")
-        Spacer(Modifier.padding(bottom = 8.dp))
-        Column(Modifier.selectableGroup()) {
-            OnnxModel.values().forEach { onnxModel ->
-                Row(
-                    Modifier.selectable(
-                        selected = model == onnxModel,
-                        onClick = { model = onnxModel },
-                        role = Role.RadioButton,
-                        enabled = !isGenerating
-                    )
-                ) {
-                    RadioButton(
-                        selected = model == onnxModel,
-                        onClick = null,
-                        enabled = !isGenerating
-                    )
-                    Text(onnxModel.label)
-                }
-            }
-        }
+        ModelSelector(
+            selectedModel = model,
+            setModel = setModel,
+            enabled = !isGenerating
+        )
         Spacer(Modifier.padding(bottom = 16.dp))
         SeedSlider(
             seedValue = seed,

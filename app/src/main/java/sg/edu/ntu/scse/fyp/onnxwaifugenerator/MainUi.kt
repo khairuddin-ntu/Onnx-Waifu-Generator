@@ -25,12 +25,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     val isGenerating = mainViewModel.isGenerating
     val generatedImages = mainViewModel.imageList
 
-    val lastIndex = if (generatedImages?.isEmpty() == true) 0
-    else {
-        generatedImages?.lastIndex ?: 0
-    }
-
-    val pagerState = rememberPagerState(lastIndex)
+    val pagerState = rememberPagerState()
 
     val (model, setModel) = rememberSaveable { mutableStateOf(OnnxModel.SKYTNT) }
     val (seed, setSeed) = rememberSaveable { mutableStateOf(0) }
@@ -51,8 +46,14 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         mainViewModel.generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
     }
 
+    // Updates on first launch & whenever generatedImages is updated
     LaunchedEffect(generatedImages) {
-        pagerState.scrollToPage(lastIndex)
+        pagerState.scrollToPage(
+            if (generatedImages?.isEmpty() == true) 0
+            else {
+                generatedImages?.lastIndex ?: 0
+            }
+        )
     }
 
     // UI

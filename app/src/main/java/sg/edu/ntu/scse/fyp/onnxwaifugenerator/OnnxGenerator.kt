@@ -3,7 +3,10 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
+import ai.onnxruntime.OrtSession.SessionOptions
+import android.content.res.Resources
 import android.util.Log
+import androidx.annotation.RawRes
 import java.nio.FloatBuffer
 import kotlin.random.Random
 
@@ -18,10 +21,26 @@ private const val TAG = "OnnxGenerator"
  */
 class OnnxGenerator(
     private val env: OrtEnvironment,
-    private val mappingSession: OrtSession,
-    private val synthesisSession: OrtSession,
+    res: Resources,
+    @RawRes
+    private val mappingRes: Int,
+    @RawRes
+    private val synthesisRes: Int,
     private val zSize: Int
 ) {
+    private val mappingSession: OrtSession
+    private val synthesisSession: OrtSession
+
+    init {
+        val sessionOptions = SessionOptions()
+        // Disabled arena memory allocator because Onnx won't clear arena when session is closed
+        // and new ones are created with each new session
+        sessionOptions.setCPUArenaAllocator(false)
+
+        mappingSession = env.createSession(loadModel(res, mappingRes))
+        synthesisSession = env.createSession(loadModel(res, synthesisRes))
+    }
+
     /**
      * Generates an image using models
      *
@@ -73,5 +92,20 @@ class OnnxGenerator(
     fun close() {
         mappingSession.close()
         synthesisSession.close()
+    }
+
+    /**
+     * Reads model file from raw folder
+     *
+     * @param res Resources object from Android UI
+     * @param rawId Resource ID of model file
+     *
+     * @return Model file as byte array
+     */
+    private fun loadModel(res: Resources, @RawRes rawId: Int): ByteArray {
+        val modelInputStream = res.openRawResource(rawId)
+        val modelBuffer = ByteArray(modelInputStream.available())
+        modelInputStream.read(modelBuffer)
+        return modelBuffer
     }
 }

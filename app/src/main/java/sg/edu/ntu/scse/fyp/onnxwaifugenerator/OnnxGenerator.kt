@@ -12,6 +12,12 @@ import kotlin.random.Random
 
 private const val TAG = "OnnxGenerator"
 
+private val sessionOptions = SessionOptions().apply {
+    // Disabled arena memory allocator because Onnx won't clear arena when session is closed
+    // and new ones are created with each new session
+    setCPUArenaAllocator(false)
+}
+
 /**
  * This class contains Onnx-related code to generate images from given models
  *
@@ -32,13 +38,8 @@ class OnnxGenerator(
     private val synthesisSession: OrtSession
 
     init {
-        val sessionOptions = SessionOptions()
-        // Disabled arena memory allocator because Onnx won't clear arena when session is closed
-        // and new ones are created with each new session
-        sessionOptions.setCPUArenaAllocator(false)
-
-        mappingSession = env.createSession(loadModel(res, mappingRes))
-        synthesisSession = env.createSession(loadModel(res, synthesisRes))
+        mappingSession = env.createSession(loadModel(res, mappingRes), sessionOptions)
+        synthesisSession = env.createSession(loadModel(res, synthesisRes), sessionOptions)
     }
 
     /**

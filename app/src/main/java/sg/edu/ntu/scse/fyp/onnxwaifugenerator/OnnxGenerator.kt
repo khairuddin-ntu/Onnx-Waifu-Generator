@@ -69,21 +69,33 @@ class OnnxGenerator(
         )
 
         val mappingOutput = mappingSession.run(mappingInputs)
+        zTensor.close()
+        psiTensor.close()
+
+        val mapOutData = mappingOutput.get(0) as OnnxTensor
+        val synMap = OnnxTensor.createTensor(env, mapOutData.floatBuffer, mapOutData.info.shape)
+        mappingOutput.close()
 
         // Run synthesis
         val noiseBuffer = FloatBuffer.wrap(floatArrayOf(noise))
         val noiseTensor = OnnxTensor.createTensor(env, noiseBuffer, longArrayOf(1))
 
         val synthesisInputs = mapOf(
-            synthesisSession.inputNames.elementAt(0) to mappingOutput.get(0) as OnnxTensor,
+            synthesisSession.inputNames.elementAt(0) to synMap,
             synthesisSession.inputNames.elementAt(1) to noiseTensor
         )
 
         val synthesisOutput = synthesisSession.run(synthesisInputs).get(0) as OnnxTensor
+        synMap.close()
+        noiseTensor.close()
+
+        val imageData = synthesisOutput.floatBuffer.array()
         val outputInfo = synthesisOutput.info
+        synthesisOutput.close()
+
         Log.d(TAG, "generateImage: Synthesis output info = $outputInfo")
         Log.d(TAG, "--generateImage--   Time taken to run = ${System.currentTimeMillis() - startTime}ms")
-        return synthesisOutput.floatBuffer.array() to outputInfo.shape
+        return imageData to outputInfo.shape
     }
 
     /**

@@ -2,7 +2,6 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
 import ai.onnxruntime.OrtEnvironment
 import android.content.res.Resources
-import androidx.annotation.RawRes
 
 class OnnxController(res: Resources) {
     private val env = OrtEnvironment.getEnvironment()

@@ -62,6 +62,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             .fillMaxSize()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
+        GeneratorForm()
         ModelSelector(
             selectedModel = model,
             setModel = setModel,

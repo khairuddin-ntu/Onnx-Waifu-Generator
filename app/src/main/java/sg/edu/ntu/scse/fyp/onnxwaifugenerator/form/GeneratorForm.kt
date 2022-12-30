@@ -1,4 +1,4 @@
-package sg.edu.ntu.scse.fyp.onnxwaifugenerator
+package sg.edu.ntu.scse.fyp.onnxwaifugenerator.form
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
 
 @Composable
 fun GeneratorForm(

@@ -1,10 +1,11 @@
-package sg.edu.ntu.scse.fyp.onnxwaifugenerator
+package sg.edu.ntu.scse.fyp.onnxwaifugenerator.form
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

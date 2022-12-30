@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
 import java.io.File
 import kotlin.math.roundToInt
 

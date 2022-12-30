@@ -29,7 +29,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
 
     val (model, setModel) = rememberSaveable { mutableStateOf(OnnxModel.SKYTNT) }
     val (seed, setSeed) = rememberSaveable { mutableStateOf(0) }
-    var isRandomSeed by rememberSaveable { mutableStateOf(false) }
+    val (isRandomSeed, setRandomSeed) = rememberSaveable { mutableStateOf(false) }
     var trunc1 by rememberSaveable { mutableStateOf(1f) }
     var trunc2 by rememberSaveable { mutableStateOf(1f) }
     var noise by rememberSaveable { mutableStateOf(0.5f) }
@@ -64,25 +64,9 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     ) {
         GeneratorForm(
             model, setModel,
+            seed, setSeed, isRandomSeed, setRandomSeed,
             isGenerating
         )
-        Spacer(Modifier.padding(bottom = 16.dp))
-        SeedSlider(
-            seedValue = seed,
-            setSeed = setSeed,
-            isEnabled = !isGenerating && !isRandomSeed
-        )
-        Row(
-            modifier = Modifier.align(Alignment.End),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = isRandomSeed,
-                onCheckedChange = { isRandomSeed = it },
-                enabled = !isGenerating
-            )
-            Text("Random")
-        }
         FloatParamSlider(
             label = "Truncation 1",
             value = trunc1,

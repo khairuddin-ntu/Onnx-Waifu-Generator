@@ -1,6 +1,7 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun GeneratorForm(
@@ -15,4 +16,12 @@ fun GeneratorForm(
     )
 }
 
+@Preview
+@Composable
+fun GeneratorFormPreview() {
+    GeneratorForm(
+        model = OnnxModel.SKYTNT,
+        setModel = {},
+        isGenerating = false
+    )
 }

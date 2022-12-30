@@ -22,8 +22,10 @@ private val sessionOptions = SessionOptions().apply {
  * This class contains Onnx-related code to generate images from given models
  *
  * @param env Onnx environment
- * @param mappingFileId Raw resource ID of mapping model
- * @param synthesisFileId Raw resource ID of synthesis model
+ * @param res Resources object to retrieve ONT file
+ * @param mappingRes Raw resource ID of mapping model
+ * @param synthesisRes Raw resource ID of synthesis model
+ * @param zSize Size of input noise
  */
 class OnnxGenerator(
     private val env: OrtEnvironment,

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,7 +25,9 @@ fun ModelSelector(
     ) {
         TextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
             readOnly = true,
             value = selectedModel.label,
             onValueChange = {},
@@ -49,4 +52,11 @@ fun ModelSelector(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun ModelSelectorPreview() {
+    val (model, setModel) = mutableStateOf(OnnxModel.SKYTNT)
+    ModelSelector(model, setModel = setModel, enabled = true)
 }

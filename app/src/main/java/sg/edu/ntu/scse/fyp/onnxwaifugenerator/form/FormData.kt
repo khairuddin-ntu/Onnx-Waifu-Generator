@@ -4,12 +4,12 @@ import androidx.compose.runtime.saveable.mapSaver
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
 
 data class FormData(
-    val model: OnnxModel,
-    val seed: Int,
-    val isRandomSeed: Boolean,
-    val trunc1: Float,
-    val trunc2: Float,
-    val noise: Float
+    val model: OnnxModel = OnnxModel.SKYTNT,
+    val seed: Int = 0,
+    val isRandomSeed: Boolean = false,
+    val trunc1: Float = 1f,
+    val trunc2: Float = 1f,
+    val noise: Float = 0.5f
 )
 
 val FormSaver = run {

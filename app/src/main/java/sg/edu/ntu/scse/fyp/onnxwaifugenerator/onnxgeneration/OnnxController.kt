@@ -1,7 +1,8 @@
-package sg.edu.ntu.scse.fyp.onnxwaifugenerator
+package sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration
 
 import ai.onnxruntime.OrtEnvironment
 import android.content.res.Resources
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.R
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
 
 class OnnxController(res: Resources) {

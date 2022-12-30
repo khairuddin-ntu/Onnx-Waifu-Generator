@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.OnnxController
 import java.io.File
 import kotlin.math.roundToInt
 

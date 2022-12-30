@@ -1,4 +1,4 @@
-package sg.edu.ntu.scse.fyp.onnxwaifugenerator
+package sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration
 
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment

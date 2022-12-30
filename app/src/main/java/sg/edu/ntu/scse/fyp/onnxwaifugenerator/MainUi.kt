@@ -30,9 +30,9 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     val (model, setModel) = rememberSaveable { mutableStateOf(OnnxModel.SKYTNT) }
     val (seed, setSeed) = rememberSaveable { mutableStateOf(0) }
     val (isRandomSeed, setRandomSeed) = rememberSaveable { mutableStateOf(false) }
-    var trunc1 by rememberSaveable { mutableStateOf(1f) }
-    var trunc2 by rememberSaveable { mutableStateOf(1f) }
-    var noise by rememberSaveable { mutableStateOf(0.5f) }
+    val (trunc1, setTrunc1) = rememberSaveable { mutableStateOf(1f) }
+    val (trunc2,setTrunc2) = rememberSaveable { mutableStateOf(1f) }
+    val (noise, setNoise) = rememberSaveable { mutableStateOf(0.5f) }
 
     val generateShape: () -> Unit = {
         val finalSeed: Int
@@ -65,28 +65,9 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         GeneratorForm(
             model, setModel,
             seed, setSeed, isRandomSeed, setRandomSeed,
+            trunc1, setTrunc1, trunc2, setTrunc2,
+            noise, setNoise,
             isGenerating
-        )
-        FloatParamSlider(
-            label = "Truncation 1",
-            value = trunc1,
-            maxValue = 2f,
-            onValueChange = { trunc1 = it },
-            isEnabled = !isGenerating
-        )
-        FloatParamSlider(
-            label = "Truncation 2",
-            value = trunc2,
-            maxValue = 2f,
-            onValueChange = { trunc2 = it },
-            isEnabled = !isGenerating
-        )
-        FloatParamSlider(
-            label = "Noise",
-            value = noise,
-            maxValue = 1f,
-            onValueChange = { noise = it },
-            isEnabled = !isGenerating
         )
         Button(
             onClick = generateShape,

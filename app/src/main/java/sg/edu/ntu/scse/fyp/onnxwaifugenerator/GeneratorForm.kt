@@ -20,6 +20,12 @@ fun GeneratorForm(
     setSeed: (Int) -> Unit,
     isRandomSeed: Boolean,
     setRandomSeed: (Boolean) -> Unit,
+    trunc1: Float,
+    setTrunc1: (Float) -> Unit,
+    trunc2: Float,
+    setTrunc2: (Float) -> Unit,
+    noise: Float,
+    setNoise: (Float) -> Unit,
     isGenerating: Boolean
 ) {
     Column {
@@ -45,6 +51,27 @@ fun GeneratorForm(
             )
             Text("Random")
         }
+        FloatParamSlider(
+            label = "Truncation 1",
+            value = trunc1,
+            maxValue = 2f,
+            onValueChange = setTrunc1,
+            isEnabled = !isGenerating
+        )
+        FloatParamSlider(
+            label = "Truncation 2",
+            value = trunc2,
+            maxValue = 2f,
+            onValueChange = setTrunc2,
+            isEnabled = !isGenerating
+        )
+        FloatParamSlider(
+            label = "Noise",
+            value = noise,
+            maxValue = 1f,
+            onValueChange = setNoise,
+            isEnabled = !isGenerating
+        )
     }
 }
 
@@ -58,6 +85,12 @@ fun GeneratorFormPreview() {
         setSeed = {},
         isRandomSeed = false,
         setRandomSeed = {},
+        trunc1 = 1f,
+        setTrunc1 = {},
+        trunc2 = 1f,
+        setTrunc2 = {},
+        noise = 0.5f,
+        setNoise = {},
         isGenerating = false,
     )
 }

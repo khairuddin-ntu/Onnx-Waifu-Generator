@@ -16,7 +16,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.MAX_SEED_VALUE
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormData
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormSaver
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.GeneratorForm
@@ -51,7 +51,13 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             finalSeed = seed
         }
 
-        context.startService(Intent(context, ImageGenerationService::class.java))
+        context.startService(
+            Intent(context, ImageGenerationService::class.java)
+                .putExtra(KEY_MODEL, model.name)
+                .putExtra(KEY_SEED, finalSeed)
+                .putExtra(KEY_TRUNCATIONS, floatArrayOf(trunc1, trunc2))
+                .putExtra(KEY_NOISE, noise)
+        )
         mainViewModel.generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
     }
 

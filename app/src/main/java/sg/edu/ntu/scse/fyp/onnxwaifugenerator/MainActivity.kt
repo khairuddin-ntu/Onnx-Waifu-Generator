@@ -12,14 +12,8 @@ import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationServ
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.ui.theme.OnnxWaifuGeneratorTheme
 
 class MainActivity : ComponentActivity() {
-    private lateinit var serviceIntent: Intent
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        serviceIntent = Intent(this, ImageGenerationService::class.java)
-        // TODO: Change to foreground service
-        startService(serviceIntent)
 
         setContent {
             OnnxWaifuGeneratorTheme {
@@ -35,7 +29,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        stopService(serviceIntent)
+        stopService(Intent(this, ImageGenerationService::class.java))
         super.onDestroy()
     }
 }

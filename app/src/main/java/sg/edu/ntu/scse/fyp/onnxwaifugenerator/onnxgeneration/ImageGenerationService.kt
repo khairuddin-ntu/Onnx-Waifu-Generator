@@ -13,6 +13,7 @@ class ImageGenerationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "++onStartCommand++")
         return START_STICKY
     }
 

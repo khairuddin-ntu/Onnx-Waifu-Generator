@@ -1,5 +1,6 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -7,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,6 +20,7 @@ import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.MAX_SEED_VALUE
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormData
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormSaver
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.GeneratorForm
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationService
 import kotlin.random.Random
 
 /**
@@ -26,6 +29,8 @@ import kotlin.random.Random
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainUi(mainViewModel: MainViewModel = viewModel()) {
+    val context = LocalContext.current
+
     val isGenerating = mainViewModel.isGenerating
     val generatedImages = mainViewModel.imageList
 
@@ -46,6 +51,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             finalSeed = seed
         }
 
+        context.startService(Intent(context, ImageGenerationService::class.java))
         mainViewModel.generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
     }
 

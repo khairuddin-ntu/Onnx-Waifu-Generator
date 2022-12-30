@@ -67,14 +67,9 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             seed, setSeed, isRandomSeed, setRandomSeed,
             trunc1, setTrunc1, trunc2, setTrunc2,
             noise, setNoise,
+            generateShape,
             isGenerating
         )
-        Button(
-            onClick = generateShape,
-            enabled = !isGenerating
-        ) {
-            Text(text = "Generate")
-        }
         Spacer(Modifier.padding(top = 8.dp))
         Box(
             Modifier

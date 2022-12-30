@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ fun GeneratorForm(
     setTrunc2: (Float) -> Unit,
     noise: Float,
     setNoise: (Float) -> Unit,
+    generateShape: () -> Unit,
     isGenerating: Boolean
 ) {
     Column {
@@ -72,6 +74,12 @@ fun GeneratorForm(
             onValueChange = setNoise,
             isEnabled = !isGenerating
         )
+        Button(
+            onClick = generateShape,
+            enabled = !isGenerating
+        ) {
+            Text(text = "Generate")
+        }
     }
 }
 
@@ -91,6 +99,7 @@ fun GeneratorFormPreview() {
         setTrunc2 = {},
         noise = 0.5f,
         setNoise = {},
+        generateShape = {},
         isGenerating = false,
     )
 }

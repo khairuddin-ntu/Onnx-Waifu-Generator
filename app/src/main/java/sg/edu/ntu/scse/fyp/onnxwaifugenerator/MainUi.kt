@@ -15,7 +15,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.MAX_SEED_VALUE
-import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormData
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormSaver
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.GeneratorForm
 import kotlin.random.Random
 
@@ -30,18 +31,17 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
 
     val pagerState = rememberPagerState()
 
-    val (model, setModel) = rememberSaveable { mutableStateOf(OnnxModel.SKYTNT) }
-    val (seed, setSeed) = rememberSaveable { mutableStateOf(0) }
-    val (isRandomSeed, setRandomSeed) = rememberSaveable { mutableStateOf(false) }
-    val (trunc1, setTrunc1) = rememberSaveable { mutableStateOf(1f) }
-    val (trunc2,setTrunc2) = rememberSaveable { mutableStateOf(1f) }
-    val (noise, setNoise) = rememberSaveable { mutableStateOf(0.5f) }
+    val (formData, setFormData) = rememberSaveable(stateSaver = FormSaver) {
+        mutableStateOf(FormData())
+    }
 
     val generateShape: () -> Unit = {
+        val (model, seed, isRandomSeed, trunc1, trunc2, noise) = formData
+
         val finalSeed: Int
         if (isRandomSeed) {
             finalSeed = Random.nextInt(0, MAX_SEED_VALUE)
-            setSeed(finalSeed)
+            setFormData(formData.copy(seed = finalSeed))
         } else {
             finalSeed = seed
         }
@@ -65,14 +65,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             .fillMaxSize()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
-        GeneratorForm(
-            model, setModel,
-            seed, setSeed, isRandomSeed, setRandomSeed,
-            trunc1, setTrunc1, trunc2, setTrunc2,
-            noise, setNoise,
-            generateShape,
-            isGenerating
-        )
+        GeneratorForm(formData, setFormData, generateShape, isGenerating)
         Spacer(Modifier.padding(top = 8.dp))
         Box(
             Modifier

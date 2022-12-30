@@ -12,67 +12,55 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
 
 @Composable
 fun GeneratorForm(
-    model: OnnxModel,
-    setModel: (OnnxModel) -> Unit,
-    seed: Int,
-    setSeed: (Int) -> Unit,
-    isRandomSeed: Boolean,
-    setRandomSeed: (Boolean) -> Unit,
-    trunc1: Float,
-    setTrunc1: (Float) -> Unit,
-    trunc2: Float,
-    setTrunc2: (Float) -> Unit,
-    noise: Float,
-    setNoise: (Float) -> Unit,
+    formData: FormData, setFormData: (FormData) -> Unit,
     generateShape: () -> Unit,
     isGenerating: Boolean
 ) {
     Column {
         ModelSelector(
-            selectedModel = model,
-            setModel = setModel,
+            selectedModel = formData.model,
+            setModel = { setFormData(formData.copy(model = it)) },
             enabled = !isGenerating
         )
         Spacer(Modifier.padding(bottom = 16.dp))
         SeedSlider(
-            seedValue = seed,
-            setSeed = setSeed,
-            isEnabled = !isGenerating && !isRandomSeed
+            seedValue = formData.seed,
+            setSeed = { setFormData(formData.copy(seed = it)) },
+            isEnabled = !isGenerating && !formData.isRandomSeed
         )
         Row(
             modifier = Modifier.align(Alignment.End),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = isRandomSeed,
-                onCheckedChange = setRandomSeed,
+                checked = formData.isRandomSeed,
+                onCheckedChange = { setFormData(formData.copy(isRandomSeed = it)) },
                 enabled = !isGenerating
             )
             Text("Random")
         }
         FloatParamSlider(
             label = "Truncation 1",
-            value = trunc1,
+            value = formData.trunc1,
             maxValue = 2f,
-            onValueChange = setTrunc1,
+            onValueChange = { setFormData(formData.copy(trunc1 = it)) },
             isEnabled = !isGenerating
         )
         FloatParamSlider(
             label = "Truncation 2",
-            value = trunc2,
+            value = formData.trunc2,
             maxValue = 2f,
-            onValueChange = setTrunc2,
+            onValueChange = { setFormData(formData.copy(trunc2 = it)) },
             isEnabled = !isGenerating
         )
         FloatParamSlider(
             label = "Noise",
-            value = noise,
+            value = formData.noise,
             maxValue = 1f,
-            onValueChange = setNoise,
+            onValueChange = { setFormData(formData.copy(noise = it)) },
             isEnabled = !isGenerating
         )
         Button(
@@ -88,18 +76,8 @@ fun GeneratorForm(
 @Composable
 fun GeneratorFormPreview() {
     GeneratorForm(
-        model = OnnxModel.SKYTNT,
-        setModel = {},
-        seed = 0,
-        setSeed = {},
-        isRandomSeed = false,
-        setRandomSeed = {},
-        trunc1 = 1f,
-        setTrunc1 = {},
-        trunc2 = 1f,
-        setTrunc2 = {},
-        noise = 0.5f,
-        setNoise = {},
+        formData = FormData(),
+        setFormData = {},
         generateShape = {},
         isGenerating = false,
     )

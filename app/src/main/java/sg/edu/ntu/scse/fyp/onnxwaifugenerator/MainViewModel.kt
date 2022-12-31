@@ -8,9 +8,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.imagelist.ImageGenFolderObserver
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationService
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.OnnxController
 import java.io.File
@@ -21,28 +23,31 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var isGenerating by mutableStateOf(false)
         private set
 
-    private val images = Channel<List<File>>()
-    val imageList = images.receiveAsFlow()
+    private val images: Channel<List<File>>
+    val imageList: Flow<List<File>>
 
+    private val fileObserver: ImageGenFolderObserver
     private val onnxController = OnnxController(app.resources)
-    private val imageListDir = File(app.filesDir, "generated_images")
 
     init {
+        val imageListDir = File(app.filesDir, "generated_images")
         if (!imageListDir.exists()) {
             imageListDir.mkdir()
         }
 
-        updateImageList()
+        images = Channel()
+        imageList = images.receiveAsFlow()
+        fileObserver = ImageGenFolderObserver(imageListDir)
+        fileObserver.startListening(this::updateImageList)
     }
 
     override fun onCleared() {
+        fileObserver.stopListening()
         images.close()
         onnxController.close()
     }
 
-    fun generateImage(
-        modelType: OnnxModel, seed: Int, psi: FloatArray, noise: Float
-    ) {
+    fun generateImage(modelType: OnnxModel, seed: Int, psi: FloatArray, noise: Float) {
         val context = getApplication<Application>()
         context.startForegroundService(
             Intent(context, ImageGenerationService::class.java)
@@ -56,11 +61,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun onImageGenerated() {
-        updateImageList()
         isGenerating = false
     }
 
-    private fun updateImageList() {
-        viewModelScope.launch { images.send(imageListDir.listFiles()?.sorted() ?: emptyList()) }
+    private fun updateImageList(list: List<File>) {
+        viewModelScope.launch { images.send(list) }
     }
 }

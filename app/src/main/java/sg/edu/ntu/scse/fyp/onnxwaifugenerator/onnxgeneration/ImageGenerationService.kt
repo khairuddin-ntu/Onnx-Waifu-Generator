@@ -2,15 +2,29 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration
 
 import android.app.Service
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.IBinder
 import android.util.Log
+import kotlinx.coroutines.*
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
+import java.io.File
+import kotlin.math.roundToInt
 
 private const val TAG = "ImageGenerationService"
 
 class ImageGenerationService : Service() {
+    private val serviceScope = CoroutineScope(Dispatchers.Default)
+
+    private lateinit var onnxController: OnnxController
+    private lateinit var imageListDir: File
+
     override fun onCreate() {
-        Log.d(TAG, "++onCreate++")
+        onnxController = OnnxController(resources)
+        imageListDir = File(filesDir, "generated_images")
+        if (!imageListDir.exists()) {
+            imageListDir.mkdir()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -34,7 +48,30 @@ class ImageGenerationService : Service() {
             return START_STICKY
         }
 
-        Log.d(TAG, "onStartCommand: Parameters = { $modelName, $seed, ${truncations.joinToString()}, $noise }")
+        // Performs shape generation in a background thread
+        serviceScope.launch {
+            val (modelOutput, shape) = onnxController.generateImage(modelType, seed, psi, noise)
+
+            Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
+            val imgWidth = shape[3].toInt()
+            val imgHeight = shape[2].toInt()
+            val bitmap = convertModelToBitmap(modelOutput, imgWidth, imgHeight)
+
+            // Save to file in app storage
+            withContext(Dispatchers.IO) {
+                val file = File(imageListDir, "model-output-${System.currentTimeMillis()}.png")
+                val fileOutputStream = file.outputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+                fileOutputStream.close()
+                Log.d(TAG, "generateShape: Bitmap stored in ${file.absolutePath}")
+            }
+
+            bitmap.recycle()
+
+            withContext(Dispatchers.Main) {
+                sendBroadcast(Intent(ACTION_SERVICE_RESPONSE))
+            }
+        }
 
         return START_STICKY
     }
@@ -42,7 +79,30 @@ class ImageGenerationService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
-        Log.d(TAG, "++onDestroy++")
+        serviceScope.cancel()
+        onnxController.close()
         super.onDestroy()
+    }
+
+    private fun convertModelToBitmap(
+        modelOutput: FloatArray,
+        imgWidth: Int, imgHeight: Int
+    ): Bitmap {
+        val minVal = modelOutput.minOrNull() ?: -1.0f
+        val maxVal = modelOutput.maxOrNull() ?: 1.0f
+        val delta = maxVal - minVal
+
+        val pixels = IntArray(imgWidth * imgHeight * 4)
+        for (i in 0 until imgWidth * imgHeight) {
+            pixels[i] = Color.rgb(
+                ((modelOutput[i] - minVal) / delta * 255.0f).roundToInt(),
+                ((modelOutput[i + imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt(),
+                ((modelOutput[i + 2 * imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt()
+            )
+        }
+
+        val bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.ARGB_8888)
+        bitmap.setPixels(pixels, 0, imgWidth, 0, 0, imgWidth, imgHeight)
+        return bitmap
     }
 }

@@ -1,6 +1,5 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -8,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -20,7 +18,7 @@ import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormData
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormSaver
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.GeneratorForm
-import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationService
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationReceiver
 import kotlin.random.Random
 
 /**
@@ -29,8 +27,6 @@ import kotlin.random.Random
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainUi(mainViewModel: MainViewModel = viewModel()) {
-    val context = LocalContext.current
-
     val isGenerating = mainViewModel.isGenerating
     val generatedImages = mainViewModel.imageList
 
@@ -51,13 +47,6 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             finalSeed = seed
         }
 
-        context.startService(
-            Intent(context, ImageGenerationService::class.java)
-                .putExtra(KEY_MODEL, model.name)
-                .putExtra(KEY_SEED, finalSeed)
-                .putExtra(KEY_TRUNCATIONS, floatArrayOf(trunc1, trunc2))
-                .putExtra(KEY_NOISE, noise)
-        )
         mainViewModel.generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
     }
 
@@ -70,6 +59,8 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             }
         )
     }
+
+    ImageGenerationReceiver(mainViewModel::onImageGenerated)
 
     // UI
     Column(

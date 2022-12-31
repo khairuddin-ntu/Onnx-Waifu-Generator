@@ -1,18 +1,15 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
 import android.app.Application
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationService
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.OnnxController
 import java.io.File
 import kotlin.math.roundToInt
@@ -44,33 +41,21 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun generateImage(
         modelType: OnnxModel, seed: Int, psi: FloatArray, noise: Float
     ) {
+        val context = getApplication<Application>()
+        context.startService(
+            Intent(context, ImageGenerationService::class.java)
+                .putExtra(KEY_MODEL, modelType.name)
+                .putExtra(KEY_SEED, seed)
+                .putExtra(KEY_TRUNCATIONS, psi)
+                .putExtra(KEY_NOISE, noise)
+        )
+
         isGenerating = true
+    }
 
-        // Performs shape generation in a background thread
-        viewModelScope.launch(Dispatchers.Default) {
-            val (modelOutput, shape) = onnxController.generateImage(modelType, seed, psi, noise)
-
-            Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
-            val imgWidth = shape[3].toInt()
-            val imgHeight = shape[2].toInt()
-            val bitmap = convertModelToBitmap(modelOutput, imgWidth, imgHeight)
-
-            // Save to file in app storage
-            withContext(Dispatchers.IO) {
-                val file = File(imageListDir, "model-output-${System.currentTimeMillis()}.png")
-                val fileOutputStream = file.outputStream()
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
-                fileOutputStream.close()
-                Log.d(TAG, "generateShape: Bitmap stored in ${file.absolutePath}")
-            }
-
-            bitmap.recycle()
-
-            withContext(Dispatchers.Main) {
-                imageList = imageListDir.listFiles()?.sorted()
-                isGenerating = false
-            }
-        }
+    fun onImageGenerated() {
+        imageList = imageListDir.listFiles()?.sorted()
+        isGenerating = false
     }
 
     private fun convertModelToBitmap(

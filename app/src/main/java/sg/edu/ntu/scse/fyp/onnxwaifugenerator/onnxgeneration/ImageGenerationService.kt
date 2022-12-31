@@ -1,5 +1,6 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration
 
+import ai.onnxruntime.OrtEnvironment
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
@@ -19,11 +20,9 @@ private const val ID_NOTIFICATION = 2319
 class ImageGenerationService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.Default)
 
-    private lateinit var onnxController: OnnxController
     private lateinit var imageListDir: File
 
     override fun onCreate() {
-        onnxController = OnnxController(resources)
         imageListDir = File(filesDir, "generated_images")
         if (!imageListDir.exists()) {
             imageListDir.mkdir()
@@ -39,7 +38,7 @@ class ImageGenerationService : Service() {
         }
 
         val modelName = intent.getStringExtra(KEY_MODEL) ?: return START_STICKY
-        val modelType = OnnxModel.valueOf(modelName)
+        val model = OnnxModel.valueOf(modelName)
 
         val seed = intent.getIntExtra(KEY_SEED, -1)
         if (seed < 0) {
@@ -61,15 +60,26 @@ class ImageGenerationService : Service() {
                 .setContentText(
                     getString(
                         R.string.template_imageGenParams,
-                        modelType.label, seed, psi[0], psi[1], noise
+                        model.label, seed, psi[0], psi[1], noise
                     )
                 )
                 .build()
         )
 
         // Performs shape generation in a background thread
+        val env = OrtEnvironment.getEnvironment()
+        val generator = when (model) {
+            OnnxModel.SKYTNT -> OnnxGenerator(
+                env, resources, R.raw.g_mapping, R.raw.g_synthesis, 1024
+            )
+            OnnxModel.CUSTOM -> OnnxGenerator(
+                env, resources, R.raw.g_mapping_aravind, R.raw.g_synthesis_aravind, 512
+            )
+        }
+
         serviceScope.launch {
-            val (modelOutput, shape) = onnxController.generateImage(modelType, seed, psi, noise)
+            val (modelOutput, shape) = generator.generateImage(seed, psi, noise)
+            generator.close()
 
             Log.d(TAG, "generateShape: Output shape = ${shape.joinToString()}")
             val imgWidth = shape[3].toInt()
@@ -101,7 +111,6 @@ class ImageGenerationService : Service() {
 
     override fun onDestroy() {
         serviceScope.cancel()
-        onnxController.close()
         super.onDestroy()
     }
 

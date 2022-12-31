@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Onnx Waifu Generator</string>
+
+    <string name="title_notificationChannel_imageGen">Image Generation Foreground Service</string>
 </resources>

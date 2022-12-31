@@ -8,19 +8,41 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.R
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.MAX_SEED_VALUE
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
+import kotlin.random.Random
 
 @Composable
 fun GeneratorForm(
-    formData: FormData, setFormData: (FormData) -> Unit,
-    generateShape: () -> Unit,
+    generateImage: (OnnxModel, Int, FloatArray, Float) -> Unit,
     isGenerating: Boolean
 ) {
+    val (formData, setFormData) = rememberSaveable(stateSaver = FormSaver) {
+        mutableStateOf(FormData())
+    }
+
+    val generateShape: () -> Unit = {
+        val (model, seed, isRandomSeed, trunc1, trunc2, noise) = formData
+
+        val finalSeed: Int
+        if (isRandomSeed) {
+            finalSeed = Random.nextInt(0, MAX_SEED_VALUE)
+            setFormData(formData.copy(seed = finalSeed))
+        } else {
+            finalSeed = seed
+        }
+
+        generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
+    }
+
     Column {
         ModelSelector(
             selectedModel = formData.model,
@@ -78,9 +100,7 @@ fun GeneratorForm(
 @Composable
 fun GeneratorFormPreview() {
     GeneratorForm(
-        formData = FormData(),
-        setFormData = {},
-        generateShape = {},
+        generateImage = { _, _, _, _ -> },
         isGenerating = false,
     )
 }

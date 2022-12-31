@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Onnx Waifu Generator</string>
+
+    <string name="title_notificationChannel_imageGen">Image Generation Foreground Service</string>
+    <string name="title_notification_imageGen">Image generation in progress</string>
+    <string name="template_imageGenParams">Model: %1$s\nSeed: %2$d\nPSI: %3$.2f, %4$.2f, Noise: %5$.2f</string>
 </resources>

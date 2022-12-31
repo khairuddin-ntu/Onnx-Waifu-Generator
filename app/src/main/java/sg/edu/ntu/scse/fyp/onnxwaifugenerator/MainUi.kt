@@ -14,10 +14,11 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.MAX_SEED_VALUE
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormData
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.FormSaver
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.form.GeneratorForm
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationReceiver
 import kotlin.random.Random
 
 /**
@@ -58,6 +59,8 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             }
         )
     }
+
+    ImageGenerationReceiver(mainViewModel::onImageGenerated)
 
     // UI
     Column(

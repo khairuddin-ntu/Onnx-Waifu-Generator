@@ -66,27 +66,40 @@ class OnnxGenerator(
         val psiBuffer = FloatBuffer.wrap(psi)
         val psiTensor = OnnxTensor.createTensor(env, psiBuffer, longArrayOf(psi.size.toLong()))
 
-        val mappingInputs = mapOf(
-            mappingSession.inputNames.elementAt(0) to zTensor,
-            mappingSession.inputNames.elementAt(1) to psiTensor
+        val mappingOutput = mappingSession.run(
+            mapOf(
+                mappingSession.inputNames.elementAt(0) to zTensor,
+                mappingSession.inputNames.elementAt(1) to psiTensor
+            )
         )
+        zTensor.close()
+        psiTensor.close()
 
-        val mappingOutput = mappingSession.run(mappingInputs)
+        val mappingData = mappingOutput.get(0) as OnnxTensor
+        val mapToSyn = OnnxTensor.createTensor(env, mappingData.floatBuffer, mappingData.info.shape)
+        mappingOutput.close()
 
         // Run synthesis
         val noiseBuffer = FloatBuffer.wrap(floatArrayOf(noise))
         val noiseTensor = OnnxTensor.createTensor(env, noiseBuffer, longArrayOf(1))
 
         val synthesisInputs = mapOf(
-            synthesisSession.inputNames.elementAt(0) to mappingOutput.get(0) as OnnxTensor,
+            synthesisSession.inputNames.elementAt(0) to mapToSyn,
             synthesisSession.inputNames.elementAt(1) to noiseTensor
         )
 
-        val synthesisOutput = synthesisSession.run(synthesisInputs).get(0) as OnnxTensor
-        val outputInfo = synthesisOutput.info
+        val synthesisOutput = synthesisSession.run(synthesisInputs)
+        mapToSyn.close()
+        noiseTensor.close()
+
+        val synthesisData = synthesisOutput.get(0) as OnnxTensor
+        val imageData = synthesisData.floatBuffer.array()
+        val outputInfo = synthesisData.info
+        synthesisOutput.close()
+
         Log.d(TAG, "generateImage: Synthesis output info = $outputInfo")
         Log.d(TAG, "--generateImage--   Time taken to run = ${System.currentTimeMillis() - startTime}ms")
-        return synthesisOutput.floatBuffer.array() to outputInfo.shape
+        return imageData to outputInfo.shape
     }
 
     /**

@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.imagelist.ImageGenFolderObserver
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationService
-import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.OnnxController
 import java.io.File
 
 private const val TAG = "MainViewModel"
@@ -27,7 +26,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val imageList: Flow<List<File>>
 
     private val fileObserver: ImageGenFolderObserver
-    private val onnxController = OnnxController(app.resources)
 
     init {
         val imageListDir = File(app.filesDir, "generated_images")
@@ -44,7 +42,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     override fun onCleared() {
         fileObserver.stopListening()
         images.close()
-        onnxController.close()
     }
 
     fun generateImage(modelType: OnnxModel, seed: Int, psi: FloatArray, noise: Float) {

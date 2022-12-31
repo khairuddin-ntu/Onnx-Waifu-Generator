@@ -7,7 +7,9 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.R
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.MAX_SEED_VALUE
 
 @Composable
@@ -17,7 +19,7 @@ fun SeedSlider(
     isEnabled: Boolean
 ) {
     Row {
-        Text("Seed")
+        Text(stringResource(R.string.label_slider_seed))
         Spacer(Modifier.weight(1f))
         Text(seedValue.toString())
     }

@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.R
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.OnnxModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +34,7 @@ fun ModelSelector(
             readOnly = true,
             value = selectedModel.label,
             onValueChange = {},
-            label = { Text("Model") },
+            label = { Text(stringResource(R.string.label_dropdown_model)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
             enabled = enabled

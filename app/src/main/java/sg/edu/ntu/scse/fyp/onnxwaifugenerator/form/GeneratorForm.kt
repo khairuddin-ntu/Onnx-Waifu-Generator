@@ -10,8 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.R
 
 @Composable
 fun GeneratorForm(
@@ -43,21 +45,21 @@ fun GeneratorForm(
             Text("Random")
         }
         FloatParamSlider(
-            label = "Truncation 1",
+            label = stringResource(R.string.label_slider_truncation1),
             value = formData.trunc1,
             maxValue = 2f,
             onValueChange = { setFormData(formData.copy(trunc1 = it)) },
             isEnabled = !isGenerating
         )
         FloatParamSlider(
-            label = "Truncation 2",
+            label = stringResource(R.string.label_slider_truncation2),
             value = formData.trunc2,
             maxValue = 2f,
             onValueChange = { setFormData(formData.copy(trunc2 = it)) },
             isEnabled = !isGenerating
         )
         FloatParamSlider(
-            label = "Noise",
+            label = stringResource(R.string.label_slider_noise),
             value = formData.noise,
             maxValue = 1f,
             onValueChange = { setFormData(formData.copy(noise = it)) },
@@ -67,7 +69,7 @@ fun GeneratorForm(
             onClick = generateShape,
             enabled = !isGenerating
         ) {
-            Text(text = "Generate")
+            Text(stringResource(R.string.label_button_generate))
         }
     }
 }

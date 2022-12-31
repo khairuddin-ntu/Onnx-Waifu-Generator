@@ -16,10 +16,23 @@ class ImageGenerationService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "++onStartCommand++")
 
-        val modelName = intent?.getStringExtra(KEY_MODEL) ?: OnnxModel.SKYTNT.name
-        val seed = intent?.getIntExtra(KEY_SEED, 0)
-        val truncations = intent?.getFloatArrayExtra(KEY_TRUNCATIONS) ?: floatArrayOf(1f, 1f)
-        val noise = intent?.getFloatExtra(KEY_NOISE, 0.5f)
+        if (intent == null) {
+            return START_STICKY
+        }
+
+        val modelName = intent.getStringExtra(KEY_MODEL) ?: return START_STICKY
+        val modelType = OnnxModel.valueOf(modelName)
+
+        val seed = intent.getIntExtra(KEY_SEED, -1)
+        if (seed < 0) {
+            return START_STICKY
+        }
+
+        val psi = intent.getFloatArrayExtra(KEY_TRUNCATIONS) ?: return START_STICKY
+        val noise = intent.getFloatExtra(KEY_NOISE, -1f)
+        if (noise < 0) {
+            return START_STICKY
+        }
 
         Log.d(TAG, "onStartCommand: Parameters = { $modelName, $seed, ${truncations.joinToString()}, $noise }")
 

@@ -6,6 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationService
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.OnnxController
@@ -17,8 +21,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var isGenerating by mutableStateOf(false)
         private set
 
-    var imageList by mutableStateOf<List<File>>(emptyList())
-        private set
+    private val images = Channel<List<File>>()
+    val imageList = images.receiveAsFlow()
 
     private val onnxController = OnnxController(app.resources)
     private val imageListDir = File(app.filesDir, "generated_images")
@@ -32,6 +36,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     override fun onCleared() {
+        images.close()
         onnxController.close()
     }
 
@@ -56,6 +61,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun updateImageList() {
-        imageList = imageListDir.listFiles()?.sorted() ?: emptyList()
+        viewModelScope.launch { images.send(imageListDir.listFiles()?.sorted() ?: emptyList()) }
     }
 }

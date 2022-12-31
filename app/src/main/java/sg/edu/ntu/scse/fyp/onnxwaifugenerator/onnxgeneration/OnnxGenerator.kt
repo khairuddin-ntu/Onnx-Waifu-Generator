@@ -28,7 +28,6 @@ private val sessionOptions = SessionOptions().apply {
  * @param zSize Size of input noise
  */
 class OnnxGenerator(
-    private val env: OrtEnvironment,
     res: Resources,
     @RawRes
     private val mappingRes: Int,
@@ -36,6 +35,8 @@ class OnnxGenerator(
     private val synthesisRes: Int,
     private val zSize: Int
 ) {
+    private val env = OrtEnvironment.getEnvironment()
+
     private val mappingSession: OrtSession
     private val synthesisSession: OrtSession
 
@@ -98,7 +99,10 @@ class OnnxGenerator(
         synthesisOutput.close()
 
         Log.d(TAG, "generateImage: Synthesis output info = $outputInfo")
-        Log.d(TAG, "--generateImage--   Time taken to run = ${System.currentTimeMillis() - startTime}ms")
+        Log.d(
+            TAG,
+            "--generateImage--   Time taken to run = ${System.currentTimeMillis() - startTime}ms"
+        )
         return imageData to outputInfo.shape
     }
 

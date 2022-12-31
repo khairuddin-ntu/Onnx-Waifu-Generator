@@ -1,6 +1,5 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration
 
-import ai.onnxruntime.OrtEnvironment
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
@@ -67,13 +66,10 @@ class ImageGenerationService : Service() {
         )
 
         // Performs shape generation in a background thread
-        val env = OrtEnvironment.getEnvironment()
         val generator = when (model) {
-            OnnxModel.SKYTNT -> OnnxGenerator(
-                env, resources, R.raw.g_mapping, R.raw.g_synthesis, 1024
-            )
+            OnnxModel.SKYTNT -> OnnxGenerator(resources, R.raw.g_mapping, R.raw.g_synthesis, 1024)
             OnnxModel.CUSTOM -> OnnxGenerator(
-                env, resources, R.raw.g_mapping_aravind, R.raw.g_synthesis_aravind, 512
+                resources, R.raw.g_mapping_aravind, R.raw.g_synthesis_aravind, 512
             )
         }
 

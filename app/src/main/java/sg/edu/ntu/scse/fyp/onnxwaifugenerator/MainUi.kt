@@ -8,7 +8,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -66,10 +66,14 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     Column(
         Modifier
             .fillMaxSize()
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(
+                top = dimensionResource(R.dimen.spacing_default),
+                start = dimensionResource(R.dimen.spacing_default),
+                end = dimensionResource(R.dimen.spacing_default)
+            )
     ) {
         GeneratorForm(formData, setFormData, generateShape, isGenerating)
-        Spacer(Modifier.padding(top = 8.dp))
+        Spacer(Modifier.padding(top = dimensionResource(R.dimen.spacing_small)))
         Box(
             Modifier
                 .fillMaxWidth()

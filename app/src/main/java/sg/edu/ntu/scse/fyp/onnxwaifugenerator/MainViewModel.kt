@@ -17,7 +17,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var isGenerating by mutableStateOf(false)
         private set
 
-    var imageList by mutableStateOf<List<File>?>(null)
+    var imageList by mutableStateOf<List<File>>(emptyList())
         private set
 
     private val onnxController = OnnxController(app.resources)
@@ -28,7 +28,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             imageListDir.mkdir()
         }
 
-        imageList = imageListDir.listFiles()?.sorted()
+        updateImageList()
     }
 
     override fun onCleared() {
@@ -51,7 +51,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun onImageGenerated() {
-        imageList = imageListDir.listFiles()?.sorted()
+        updateImageList()
         isGenerating = false
+    }
+
+    private fun updateImageList() {
+        imageList = imageListDir.listFiles()?.sorted() ?: emptyList()
     }
 }

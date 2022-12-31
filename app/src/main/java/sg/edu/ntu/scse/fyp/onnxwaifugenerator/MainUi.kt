@@ -41,7 +41,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
         ) {
             if (isGenerating) {
                 CircularProgressIndicator(Modifier.align(Alignment.TopCenter))
-            } else if (generatedImages != null) {
+            } else {
                 ImageList(generatedImages)
             }
         }

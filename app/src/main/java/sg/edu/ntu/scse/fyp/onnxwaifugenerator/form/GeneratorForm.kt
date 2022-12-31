@@ -25,17 +25,18 @@ fun GeneratorForm(
     generateImage: (OnnxModel, Int, FloatArray, Float) -> Unit,
     isGenerating: Boolean
 ) {
-    val (formData, setFormData) = rememberSaveable(stateSaver = FormSaver) {
-        mutableStateOf(FormData())
-    }
+    val (model, setModel) = rememberSaveable { mutableStateOf(OnnxModel.SKYTNT) }
+    val (seed, setSeed) = rememberSaveable { mutableStateOf(0) }
+    val (isRandomSeed, setRandomSeed) = rememberSaveable { mutableStateOf(false) }
+    val (trunc1, setTrunc1) = rememberSaveable { mutableStateOf(1f) }
+    val (trunc2, setTrunc2) = rememberSaveable { mutableStateOf(1f) }
+    val (noise, setNoise) = rememberSaveable { mutableStateOf(0.5f) }
 
     val generateShape: () -> Unit = {
-        val (model, seed, isRandomSeed, trunc1, trunc2, noise) = formData
-
         val finalSeed: Int
         if (isRandomSeed) {
             finalSeed = Random.nextInt(0, MAX_SEED_VALUE)
-            setFormData(formData.copy(seed = finalSeed))
+            setSeed(finalSeed)
         } else {
             finalSeed = seed
         }
@@ -45,46 +46,46 @@ fun GeneratorForm(
 
     Column {
         ModelSelector(
-            selectedModel = formData.model,
-            setModel = { setFormData(formData.copy(model = it)) },
+            selectedModel = model,
+            setModel = setModel,
             enabled = !isGenerating
         )
         Spacer(Modifier.padding(bottom = dimensionResource(R.dimen.spacing_default)))
         SeedSlider(
-            seedValue = formData.seed,
-            setSeed = { setFormData(formData.copy(seed = it)) },
-            isEnabled = !isGenerating && !formData.isRandomSeed
+            seedValue = seed,
+            setSeed = setSeed,
+            isEnabled = !isGenerating && !isRandomSeed
         )
         Row(
             modifier = Modifier.align(Alignment.End),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = formData.isRandomSeed,
-                onCheckedChange = { setFormData(formData.copy(isRandomSeed = it)) },
+                checked = isRandomSeed,
+                onCheckedChange = setRandomSeed,
                 enabled = !isGenerating
             )
             Text("Random")
         }
         FloatParamSlider(
             label = stringResource(R.string.label_slider_truncation1),
-            value = formData.trunc1,
+            value = trunc1,
             maxValue = 2f,
-            onValueChange = { setFormData(formData.copy(trunc1 = it)) },
+            onValueChange = setTrunc1,
             isEnabled = !isGenerating
         )
         FloatParamSlider(
             label = stringResource(R.string.label_slider_truncation2),
-            value = formData.trunc2,
+            value = trunc2,
             maxValue = 2f,
-            onValueChange = { setFormData(formData.copy(trunc2 = it)) },
+            onValueChange = setTrunc2,
             isEnabled = !isGenerating
         )
         FloatParamSlider(
             label = stringResource(R.string.label_slider_noise),
-            value = formData.noise,
+            value = noise,
             maxValue = 1f,
-            onValueChange = { setFormData(formData.copy(noise = it)) },
+            onValueChange = setNoise,
             isEnabled = !isGenerating
         )
         Button(

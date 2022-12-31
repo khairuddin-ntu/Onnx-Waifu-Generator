@@ -57,26 +57,4 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         imageList = imageListDir.listFiles()?.sorted()
         isGenerating = false
     }
-
-    private fun convertModelToBitmap(
-        modelOutput: FloatArray,
-        imgWidth: Int, imgHeight: Int
-    ): Bitmap {
-        val minVal = modelOutput.minOrNull() ?: -1.0f
-        val maxVal = modelOutput.maxOrNull() ?: 1.0f
-        val delta = maxVal - minVal
-
-        val pixels = IntArray(imgWidth * imgHeight * 4)
-        for (i in 0 until imgWidth * imgHeight) {
-            pixels[i] = Color.rgb(
-                ((modelOutput[i] - minVal) / delta * 255.0f).roundToInt(),
-                ((modelOutput[i + imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt(),
-                ((modelOutput[i + 2 * imgWidth * imgHeight] - minVal) / delta * 255.0f).roundToInt()
-            )
-        }
-
-        val bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.ARGB_8888)
-        bitmap.setPixels(pixels, 0, imgWidth, 0, 0, imgWidth, imgHeight)
-        return bitmap
-    }
 }

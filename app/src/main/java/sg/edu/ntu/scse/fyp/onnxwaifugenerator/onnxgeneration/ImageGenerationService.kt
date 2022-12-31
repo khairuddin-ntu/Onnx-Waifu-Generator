@@ -22,7 +22,7 @@ class ImageGenerationService : Service() {
     private lateinit var imageListDir: File
 
     override fun onCreate() {
-        imageListDir = File(filesDir, "generated_images")
+        imageListDir = File(filesDir, FOLDER_GENERATES_IMAGES)
         if (!imageListDir.exists()) {
             imageListDir.mkdir()
         }

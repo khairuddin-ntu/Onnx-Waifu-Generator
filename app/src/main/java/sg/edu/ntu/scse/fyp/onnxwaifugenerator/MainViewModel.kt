@@ -28,7 +28,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val fileObserver: ImageGenFolderObserver
 
     init {
-        val imageListDir = File(app.filesDir, "generated_images")
+        val imageListDir = File(app.filesDir, FOLDER_GENERATES_IMAGES)
         if (!imageListDir.exists()) {
             imageListDir.mkdir()
         }

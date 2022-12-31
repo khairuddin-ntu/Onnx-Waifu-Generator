@@ -10,3 +10,5 @@ const val ACTION_SERVICE_RESPONSE = "service_response"
 const val MAX_SEED_VALUE = 100_000
 
 const val CHANNEL_IMAGE_GENERATION = "image_generation"
+
+const val FOLDER_GENERATES_IMAGES = "generated_images"

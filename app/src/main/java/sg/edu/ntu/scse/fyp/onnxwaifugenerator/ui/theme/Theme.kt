@@ -15,14 +15,8 @@ fun OnnxWaifuGeneratorTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
-
     MaterialTheme(
-        colorScheme = colors,
+        colorScheme = if (darkTheme) DarkColorPalette else LightColorPalette,
         content = content
     )
 }

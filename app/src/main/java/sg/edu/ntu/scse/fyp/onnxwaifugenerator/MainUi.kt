@@ -34,7 +34,10 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
                 end = dimensionResource(R.dimen.spacing_default)
             )
     ) {
-        GeneratorForm(mainViewModel::generateImage, isGenerating)
+        GeneratorForm(
+            generateImage = mainViewModel::generateImage,
+            isGenerating = isGenerating
+        )
         Spacer(Modifier.padding(top = dimensionResource(R.dimen.spacing_small)))
         Box(
             Modifier
@@ -44,7 +47,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             if (isGenerating) {
                 CircularProgressIndicator(Modifier.align(Alignment.TopCenter))
             } else {
-                ImageList(generatedImages)
+                ImageList(images = generatedImages)
             }
         }
     }

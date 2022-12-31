@@ -88,8 +88,9 @@ class ImageGenerationService : Service() {
             bitmap.recycle()
 
             withContext(Dispatchers.Main) {
-                stopForeground(STOP_FOREGROUND_REMOVE)
                 sendBroadcast(Intent(ACTION_SERVICE_RESPONSE))
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
             }
         }
 

@@ -2,8 +2,6 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 
 import android.app.Application
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Color
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,7 +10,6 @@ import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationService
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.OnnxController
 import java.io.File
-import kotlin.math.roundToInt
 
 private const val TAG = "MainViewModel"
 
@@ -42,7 +39,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         modelType: OnnxModel, seed: Int, psi: FloatArray, noise: Float
     ) {
         val context = getApplication<Application>()
-        context.startService(
+        context.startForegroundService(
             Intent(context, ImageGenerationService::class.java)
                 .putExtra(KEY_MODEL, modelType.name)
                 .putExtra(KEY_SEED, seed)

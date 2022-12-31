@@ -1,5 +1,6 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration
 
+import android.app.Notification
 import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
@@ -7,11 +8,13 @@ import android.graphics.Color
 import android.os.IBinder
 import android.util.Log
 import kotlinx.coroutines.*
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.R
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
 import java.io.File
 import kotlin.math.roundToInt
 
 private const val TAG = "ImageGenerationService"
+private const val ID_NOTIFICATION = 2319
 
 class ImageGenerationService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.Default)
@@ -30,6 +33,7 @@ class ImageGenerationService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "++onStartCommand++")
 
+        // Get parameters
         if (intent == null) {
             return START_STICKY
         }
@@ -47,6 +51,21 @@ class ImageGenerationService : Service() {
         if (noise < 0) {
             return START_STICKY
         }
+
+        // Create permanent notification
+        startForeground(
+            ID_NOTIFICATION, Notification.Builder(this, CHANNEL_IMAGE_GENERATION)
+                .setOngoing(true)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(getString(R.string.title_notification_imageGen))
+                .setContentText(
+                    getString(
+                        R.string.template_imageGenParams,
+                        modelType.label, seed, psi[0], psi[1], noise
+                    )
+                )
+                .build()
+        )
 
         // Performs shape generation in a background thread
         serviceScope.launch {
@@ -69,6 +88,7 @@ class ImageGenerationService : Service() {
             bitmap.recycle()
 
             withContext(Dispatchers.Main) {
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 sendBroadcast(Intent(ACTION_SERVICE_RESPONSE))
             }
         }

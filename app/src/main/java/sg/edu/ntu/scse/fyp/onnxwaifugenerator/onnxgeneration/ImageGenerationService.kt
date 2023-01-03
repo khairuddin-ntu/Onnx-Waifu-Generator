@@ -10,6 +10,9 @@ import android.util.Log
 import kotlinx.coroutines.*
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.R
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.*
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.imagerepo.ImageInsertDAO
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.imagerepo.ImageRepository
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.imagerepo.RenderedImage
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -19,9 +22,12 @@ private const val ID_NOTIFICATION = 2319
 class ImageGenerationService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.Default)
 
+    private lateinit var dao: ImageInsertDAO
     private lateinit var imageListDir: File
 
     override fun onCreate() {
+        dao = ImageRepository.getDatabase(this).imageInsertDao()
+
         imageListDir = File(filesDir, FOLDER_GENERATES_IMAGES)
         if (!imageListDir.exists()) {
             imageListDir.mkdir()
@@ -89,6 +95,16 @@ class ImageGenerationService : Service() {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
                 fileOutputStream.close()
                 Log.d(TAG, "generateShape: Bitmap stored in ${file.absolutePath}")
+
+                dao.addImage(
+                    RenderedImage(
+                        filePath = file.absolutePath,
+                        seed = seed,
+                        psi1 = psi[0],
+                        psi2 = psi[1],
+                        noise = noise
+                    )
+                )
             }
 
             bitmap.recycle()

@@ -3,37 +3,28 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator.imagelist
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
-import sg.edu.ntu.scse.fyp.onnxwaifugenerator.common.FOLDER_GENERATES_IMAGES
+import sg.edu.ntu.scse.fyp.onnxwaifugenerator.imagerepo.ImageRepository
 import java.io.File
 
 class ImageListViewModel(app: Application) : AndroidViewModel(app) {
-    private val images: Channel<List<File>>
-    val imageList: Flow<List<File>>
+    private val dao = ImageRepository.getDatabase(app).imageListDao()
 
-    private val fileObserver: ImageGenFolderObserver
+    private val images = Channel<List<File>>()
+    val imageList = images.receiveAsFlow()
 
-    init {
-        val imageListDir = File(app.filesDir, FOLDER_GENERATES_IMAGES)
-        if (!imageListDir.exists()) {
-            imageListDir.mkdir()
-        }
-
-        images = Channel()
-        imageList = images.receiveAsFlow()
-        fileObserver = ImageGenFolderObserver(imageListDir)
-        fileObserver.startListening(this::updateImageList)
-    }
+    private val daoJob: Job = dao.getAllImagePaths()
+        .map { it.map(::File) }
+        .onEach(images::send)
+        .launchIn(viewModelScope)
 
     override fun onCleared() {
-        fileObserver.stopListening()
+        daoJob.cancel()
         images.close()
-    }
-
-    private fun updateImageList(list: List<File>) {
-        viewModelScope.launch { images.send(list) }
     }
 }

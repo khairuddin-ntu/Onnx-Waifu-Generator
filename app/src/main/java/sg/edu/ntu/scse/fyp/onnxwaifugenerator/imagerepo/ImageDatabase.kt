@@ -5,4 +5,5 @@ import androidx.room.RoomDatabase
 
 @Database(version = 1, entities = [RenderedImage::class])
 abstract class ImageDatabase : RoomDatabase() {
+    abstract fun imageListDao(): ImageListDAO
 }

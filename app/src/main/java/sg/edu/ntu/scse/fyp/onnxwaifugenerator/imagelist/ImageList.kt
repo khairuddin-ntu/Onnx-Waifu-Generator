@@ -5,16 +5,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import java.io.File
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun ImageList(images: List<File>) {
+fun ImageList(listViewModel: ImageListViewModel = viewModel()) {
+    val images by listViewModel.imageList.collectAsState(emptyList())
     val pagerState = rememberPagerState()
 
     // Updates on first launch & whenever generatedImages is updated

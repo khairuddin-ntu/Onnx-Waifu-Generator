@@ -3,8 +3,6 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -20,7 +18,6 @@ import sg.edu.ntu.scse.fyp.onnxwaifugenerator.onnxgeneration.ImageGenerationRece
 @Composable
 fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     val isGenerating = mainViewModel.isGenerating
-    val generatedImages by mainViewModel.imageList.collectAsState(emptyList())
 
     ImageGenerationReceiver(mainViewModel::onImageGenerated)
 
@@ -47,7 +44,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             if (isGenerating) {
                 CircularProgressIndicator(Modifier.align(Alignment.TopCenter))
             } else {
-                ImageList(images = generatedImages)
+                ImageList()
             }
         }
     }

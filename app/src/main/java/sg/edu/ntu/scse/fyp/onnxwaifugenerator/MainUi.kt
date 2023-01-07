@@ -22,7 +22,7 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
     ImageGenerationReceiver(mainViewModel::onImageGenerated)
 
     NavHost(navController, startDestination = NAV_IMAGE_LIST) {
-        composable(NAV_IMAGE_LIST) { ImageList() }
+        composable(NAV_IMAGE_LIST) { ImageList { navController.navigate(NAV_GENERATE) } }
         composable(NAV_GENERATE) {
             GeneratorForm(
                 generateImage = mainViewModel::generateImage,

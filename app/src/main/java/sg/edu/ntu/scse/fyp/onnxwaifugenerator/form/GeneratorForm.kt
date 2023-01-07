@@ -104,9 +104,18 @@ fun GeneratorForm(
 
 @Preview
 @Composable
-fun GeneratorFormPreview() {
+fun NotGeneratingPreview() {
     GeneratorForm(
         generateImage = { _, _, _, _ -> },
         isGenerating = false,
+    )
+}
+
+@Preview
+@Composable
+fun GeneratingPreview() {
+    GeneratorForm(
+        generateImage = { _, _, _, _ -> },
+        isGenerating = true,
     )
 }

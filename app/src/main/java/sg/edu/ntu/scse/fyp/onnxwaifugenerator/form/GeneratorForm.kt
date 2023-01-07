@@ -1,9 +1,6 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator.form
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
@@ -44,7 +41,11 @@ fun GeneratorForm(
         generateImage(model, finalSeed, floatArrayOf(trunc1, trunc2), noise)
     }
 
-    Column {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(dimensionResource(R.dimen.spacing_default))
+    ) {
         ModelSelector(
             selectedModel = model,
             setModel = setModel,

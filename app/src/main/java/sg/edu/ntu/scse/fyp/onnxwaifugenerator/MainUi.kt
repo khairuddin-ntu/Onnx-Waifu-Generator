@@ -30,32 +30,4 @@ fun MainUi(mainViewModel: MainViewModel = viewModel()) {
             )
         }
     }
-
-    // UI
-//    Column(
-//        Modifier
-//            .fillMaxSize()
-//            .padding(
-//                top = dimensionResource(R.dimen.spacing_default),
-//                start = dimensionResource(R.dimen.spacing_default),
-//                end = dimensionResource(R.dimen.spacing_default)
-//            )
-//    ) {
-//        GeneratorForm(
-//            generateImage = mainViewModel::generateImage,
-//            isGenerating = isGenerating
-//        )
-//        Spacer(Modifier.padding(top = dimensionResource(R.dimen.spacing_small)))
-//        Box(
-//            Modifier
-//                .fillMaxWidth()
-//                .height(with(LocalDensity.current) { 1024.toDp() })
-//        ) {
-//            if (isGenerating) {
-//                CircularProgressIndicator(Modifier.align(Alignment.TopCenter))
-//            } else {
-//                ImageList()
-//            }
-//        }
-//    }
 }

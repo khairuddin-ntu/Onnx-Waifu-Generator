@@ -3,6 +3,7 @@ package sg.edu.ntu.scse.fyp.onnxwaifugenerator.form
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -94,6 +95,9 @@ fun GeneratorForm(
             enabled = !isGenerating
         ) {
             Text(stringResource(R.string.label_button_generate))
+        }
+        if (isGenerating) {
+            CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
         }
     }
 }

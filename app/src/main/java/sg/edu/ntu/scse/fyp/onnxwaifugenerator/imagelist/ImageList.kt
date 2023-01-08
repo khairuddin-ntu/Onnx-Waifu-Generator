@@ -1,5 +1,6 @@
 package sg.edu.ntu.scse.fyp.onnxwaifugenerator.imagelist
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,10 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -21,12 +20,16 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.flow.collectLatest
 import sg.edu.ntu.scse.fyp.onnxwaifugenerator.R
+import java.io.File
+
+private const val TAG = "ImageList"
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ImageList(listViewModel: ImageListViewModel = viewModel(), launchForm: () -> Unit) {
-    val images by listViewModel.imageList.collectAsState(emptyList())
+    var images by rememberSaveable { mutableStateOf<List<File>>(emptyList()) }
     val pagerState = rememberPagerState()
 
     // Updates on first launch & whenever generatedImages is updated
@@ -35,6 +38,13 @@ fun ImageList(listViewModel: ImageListViewModel = viewModel(), launchForm: () ->
             if (images.isEmpty()) 0
             else images.lastIndex
         )
+    }
+
+    LaunchedEffect(Unit) {
+        listViewModel.imageList.collectLatest { newList ->
+            Log.d(TAG, "listViewModel.imageList: Collecting list of size ${newList.size}")
+            images = newList
+        }
     }
 
     Box {
